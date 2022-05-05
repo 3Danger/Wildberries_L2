@@ -14,13 +14,18 @@ import (
 	В нашем примере в качестве фасада выступает функция DoItWork() из пакета Job
 */
 
-func main() {
+//DoIt Это наш супер фасад
+func DoIt() {
 	wg := sync.WaitGroup{}
 	wg.Add(3)
 
-	// DoItWork() Это наш фасад найма на работу, и начала работы
+	//DoItWork Это наш фасад найма на работу, и начала работы
 	go Job.DoItWork(&wg, Job.NewDancerJob(), Animal.NewElephant())
 	go Job.DoItWork(&wg, Job.NewLoaderJob(), Animal.NewBull())
 	go Job.DoItWork(&wg, Job.NewPosterJob(), Animal.NewMonkey())
 	wg.Wait()
+}
+
+func main() {
+	DoIt()
 }
