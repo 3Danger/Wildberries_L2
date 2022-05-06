@@ -33,7 +33,7 @@ func NewAccount(name string, money float64) *Account {
 	return &Account{name, money}
 }
 
-// aCommand родитель для всех команд, вспомогательный, приватный на случай если будем инкапсулировать по пакетам
+// aCommand родитель для всех команд, вспомогательный
 type aCommand struct {
 	account        *Account
 	isCompleted    bool
@@ -44,7 +44,7 @@ func (a *aCommand) IsCompleted() bool {
 	return a.isCompleted
 }
 
-// newACommandAccount приватный конструктор на случай если будем инкапсулировать по пакетам
+// newACommandAccount Конструктор
 func newACommandAccount(account *Account, money float64) *aCommand {
 	return &aCommand{account, false, money}
 }
