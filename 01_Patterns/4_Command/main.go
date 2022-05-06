@@ -33,7 +33,7 @@ func NewAccount(name string, money float64) *Account {
 	return &Account{name, money}
 }
 
-// aCommand приватный родитель для всех команд, вспомогательный
+// aCommand родитель для всех команд, вспомогательный, приватный на случай если будем инкапсулировать по пакетам
 type aCommand struct {
 	account        *Account
 	isCompleted    bool
@@ -132,15 +132,4 @@ func main() {
 
 	fmt.Println(*rasul)
 	fmt.Println(*ildar)
-
-	//ildar := NewAccount("Ildar", 0)
-	//managerIldar := CmdManager{}
-	//if err := managerIldar.
-	//	Add(NewDeposit(999, ildar)).
-	//	Add(NewWithdraw(33, ildar)).
-	//	Add(NewWithdraw(132.3, ildar)).
-	//	Run(); err != nil {
-	//	log.Fatalln(err)
-	//}
-	//fmt.Println(strings.Repeat("-", 65))
 }
