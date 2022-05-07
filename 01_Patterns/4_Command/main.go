@@ -116,8 +116,12 @@ func (e *CmdManager) Run() (ok error) {
 
 func main() {
 	fmt.Println(strings.Repeat("-", 65))
+
+	// Создаем 2 аккаунта над которыми будут применяться команды
 	rasul := NewAccount("Rasul", 0)
 	ildar := NewAccount("Ildar", 0)
+
+	//Добавляем команды в менеджер-команд, и исполняем их через вызов Run()
 	cmdManager := CmdManager{}
 	if err := cmdManager.
 		Add(NewDeposit(820, rasul)).
@@ -130,6 +134,7 @@ func main() {
 	}
 	fmt.Println(strings.Repeat("-", 65))
 
+	// Выводим итоговый остаток баланса по аккаунтам
 	fmt.Println(*rasul)
 	fmt.Println(*ildar)
 }
