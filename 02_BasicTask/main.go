@@ -1,9 +1,9 @@
 package main
 
 import (
+	"02_BasicTask/etime"
 	"flag"
 	"fmt"
-	"github.com/3Danger/Wildberries_L2/02_BasicTask/etime"
 	"os"
 )
 
