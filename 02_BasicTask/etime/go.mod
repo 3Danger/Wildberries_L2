@@ -1,4 +1,4 @@
-module github.com/3Danger/Wildberries_L2/02_BasicTask/exact_time
+module github.com/3Danger/Wildberries_L2/02_BasicTask/etime
 
 go 1.18
 
