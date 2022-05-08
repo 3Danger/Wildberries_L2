@@ -3,7 +3,6 @@ package main
 import (
 	"flag"
 	"fmt"
-	"github.com/3Danger/Wildberries_L2/02_BasicTask/exact_time"
 	"os"
 )
 

@@ -1,4 +1,4 @@
-package exact_time
+package etime
 
 import (
 	"testing"

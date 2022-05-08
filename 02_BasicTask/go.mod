@@ -2,8 +2,6 @@ module github.com/3Danger/Wildberries_L2/02_BasicTask
 
 go 1.18
 
-require github.com/3Danger/Wildberries_L2/02_BasicTask/exact_time v0.0.0-20220508181656-292fea7e38c9
-
 require (
 	github.com/beevik/ntp v0.3.0 // indirect
 	github.com/davecgh/go-spew v1.1.1 // indirect
