@@ -54,31 +54,50 @@ func NewLightBulb() *LightBulb {
 }
 
 // On Off Переключение состояний
-func (l *LightBulb) On() {
-	if ok := l.state.On(); ok != nil {
-		fmt.Println(ok)
-	} else {
+func (l *LightBulb) On() (ok error) {
+	if ok = l.state.On(); ok == nil {
 		l.state = On{}
 	}
+	return ok
 }
-func (l *LightBulb) Off() {
-	if ok := l.state.Off(); ok != nil {
-		fmt.Println(ok)
-	} else {
+func (l *LightBulb) Off() (ok error) {
+	if ok = l.state.Off(); ok == nil {
 		l.state = Off{}
 	}
+	return ok
 }
 
 func main() {
-	bulb := NewLightBulb() // Создаем объекта с состоянием выкл
-	bulb.Off()             // Поскольку она уже выключена, будет сообщение об ошибке
-	bulb.On()              // Изначально была выкл, поэтому без проблем переключится... итд
-	bulb.On()
-	bulb.Off()
-	bulb.On()
-	bulb.Off()
-	bulb.Off()
-	bulb.Off()
+	var ok error
+	bulb := NewLightBulb()          // Создаем объекта с состоянием выкл
+	if ok = bulb.Off(); ok != nil { // Поскольку она уже выключена, будет сообщение об ошибке
+		fmt.Println(ok)
+	}
+	if ok = bulb.On(); ok != nil { // Текущее состояние ВЫКЛ, поэтому без проблем переключится на ВКЛ... итд
+		fmt.Println(ok)
+	}
+	if ok = bulb.Off(); ok != nil {
+		fmt.Println(ok)
+	}
+	if ok = bulb.Off(); ok != nil {
+		fmt.Println(ok)
+	}
+	if ok = bulb.On(); ok != nil {
+		fmt.Println(ok)
+	}
+	if ok = bulb.Off(); ok != nil {
+		fmt.Println(ok)
+	}
+	if ok = bulb.Off(); ok != nil {
+		fmt.Println(ok)
+	}
+	if ok = bulb.On(); ok != nil {
+		fmt.Println(ok)
+	}
+	if ok = bulb.On(); ok != nil {
+		fmt.Println(ok)
+	}
+
 }
 
 // Red Grn Цвета для удобного чтения
