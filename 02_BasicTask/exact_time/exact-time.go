@@ -1,6 +1,6 @@
 package exact_time
 
-import ntp "github.com/beevik/ntp"
+import "github.com/beevik/ntp"
 
 func GetExactTime(host string) (string, error) {
 	time, ok := ntp.Time(host)
