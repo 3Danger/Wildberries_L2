@@ -1,16 +1,20 @@
 package main
 
 import (
+	"flag"
 	"fmt"
 	"github.com/3Danger/Wildberries_L2/02_BasicTask/exact_time"
-	"log"
+	"os"
 )
 
 func main() {
-	time, err := exact_time.GetExactTime("time.apple.com")
+	var host string
+	flag.StringVar(&host, "h", "time.apple.com", "set host address")
+	flag.Parse()
+	tm, err := exact_time.GetExactTime(host)
 	if err != nil {
-		log.Panic(err)
-		return
+		_, _ = fmt.Fprintln(os.Stderr, err)
+		os.Exit(1)
 	}
-	fmt.Println(time)
+	fmt.Println(tm.String())
 }
