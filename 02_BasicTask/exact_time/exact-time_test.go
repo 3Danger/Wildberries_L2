@@ -6,9 +6,9 @@ import (
 )
 
 func TestGetExactTime(t *testing.T) {
-	time, err := GetExactTime("time.apple.com")
+	tm, err := GetExactTime("time.apple.com")
 	if err != nil {
 		return
 	}
-	fmt.Println(time)
+	fmt.Println(tm)
 }

@@ -1,11 +1,14 @@
 package exact_time
 
-import "github.com/beevik/ntp"
+import (
+	"github.com/beevik/ntp"
+	"time"
+)
 
-func GetExactTime(host string) (string, error) {
-	time, ok := ntp.Time(host)
+func GetExactTime(host string) (*time.Time, error) {
+	tm, ok := ntp.Time(host)
 	if ok != nil {
-		return "", ok
+		return nil, ok
 	}
-	return time.String(), nil
+	return &tm, nil
 }
