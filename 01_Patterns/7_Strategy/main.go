@@ -23,8 +23,8 @@ import (
 func main() {
 	data := []string{"Стратегия", "—", "это", "поведенческий", "паттерн", "проектирования,", "который", "определяет", "семейство", "схожих", "алгоритмов", "и", "помещает"}
 	ApplyingStrategy(data, Upper{})
-	ApplyingStrategy(data, CezarCode{666})
 	ApplyingStrategy(data, SortLength{})
+	ApplyingStrategy(data, СaesarСipher{-12})
 	ApplyingStrategy(data, SortLexicographic{})
 }
 
@@ -47,8 +47,8 @@ type Upper struct{}
 //SortLength сортирует по длине слова
 type SortLength struct{}
 
-//CezarCode применяет шифр цезаря
-type CezarCode struct{ level int }
+//СaesarСipher применяет шифр цезаря
+type СaesarСipher struct{ level int }
 
 //SortLexicographic Сортирует лексикографически
 type SortLexicographic struct{}
@@ -93,7 +93,7 @@ func (SortLexicographic) Processing(s []string) {
 	}
 }
 
-func (c CezarCode) Processing(s []string) {
+func (c СaesarСipher) Processing(s []string) {
 	size := len(s)
 	up := func(s string) string {
 		res := make([]rune, len(s))
