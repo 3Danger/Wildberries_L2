@@ -2,9 +2,9 @@ package sort
 
 import (
 	"04_Sort/pkg/utils"
-	"math"
 	"reflect"
 	"strconv"
+	"unicode"
 )
 
 /*
@@ -65,20 +65,24 @@ func (NumValueSort) Compare(a, b []rune, k int, delim rune) bool {
 	_, _, _, _ = sa, sb, ssa, ssb
 	parseInt := func(a []rune) int {
 		l := 0
-		for l < len(a) && utils.IsNumber(a[l]) {
+		for l < len(a) && unicode.IsDigit(a[l]) {
 			l++
 		}
 		l64, ok := strconv.ParseInt(string(a[:l]), 10, 32)
-		if ok != nil {
-			l64 = math.MaxInt
+		if ok != nil || l == len(a) {
+			l64 = -1
 		}
 		return int(l64)
 	}
 	massa, massb := parseInt(a[ai:]), parseInt(b[bi:])
 	if massa != massb {
+		if massa == 0 || massb == 0 {
+			return massa != 0
+		}
 		return massa > massb
 	} else {
-		return string(a[ai:]) < string(b[bi:])
+		//return string(a[ai:]) < string(b[bi:])
+		return !utils.StringComparator(a[ai:], b[bi:])
 	}
 }
 
@@ -94,12 +98,16 @@ func (DefaultSort) Compare(a, b []rune, k int, delim rune) bool {
 	if lena == 0 || lenb == 0 {
 		return lenb == 0
 	}
-	for ; ai < lena && bi < lenb; ai, bi = ai+1, bi+1 {
-		if a[ai] != b[bi] {
-			return a[ai] < b[bi]
-		}
-	}
-	return lena < lenb
+	return utils.StringComparator(a[ai:], b[bi:])
+	//for ; ai < lena && bi < lenb; ai, bi = ai+1, bi+1 {
+	//	if (a[ai] == delim || b[bi] == delim) && a[ai] != b[bi] {
+	//		return a[ai] != delim
+	//	}
+	//	if a[ai] != b[bi] {
+	//		return string(a[ai:]) < string(b[bi:])
+	//	}
+	//}
+	//return lena > lenb
 }
 
 // Reverse -r — сортировать в обратном порядке
