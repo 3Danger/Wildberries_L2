@@ -5,7 +5,6 @@ import (
 	"04_Sort/pkg/utils"
 	"fmt"
 	"io/ioutil"
-	"log"
 	"os"
 )
 
@@ -29,15 +28,15 @@ import (
 
 func main() {
 	flags, k := utils.ParseFlags()
-	//all, err := ioutil.ReadAll(os.Stdin)
-	open, err := os.Open("./txt")
+	all, err := ioutil.ReadAll(os.Stdin)
+	//open, err := os.Open("./txt2")
 	if err != nil {
 		return
 	}
-	all, err := ioutil.ReadAll(open)
-	if err != nil {
-		log.Panic(err)
-	}
+	//all, err := ioutil.ReadAll(open)
+	//if err != nil {
+	//	log.Panic(err)
+	//}
 	//fmt.Println("BEFORE\n", string(bytes.Runes(all)))
 	//fmt.Println("AFTER\n", sort.NewSortUtil(all, flags, k).Run())
 	fmt.Println(sort.NewSortUtil(all, flags, k).Run())

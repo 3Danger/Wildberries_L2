@@ -1,6 +1,7 @@
 package sort
 
 import (
+	bytes2 "bytes"
 	"reflect"
 	"strings"
 )
@@ -38,6 +39,7 @@ type ICommand interface {
 }
 
 func NewSortUtil(bytes []byte, keys *map[byte]bool, k int) *Sort {
+	bytes = bytes2.Trim(bytes, "\n")
 	tmp := strings.Split(string(bytes), "\n")
 	runes := make([][]rune, len(tmp))
 	for i, v := range tmp {

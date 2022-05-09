@@ -10,10 +10,10 @@ import (
 /*
 	Реализовать поддержку утилитой следующих ключей:
 
-	-k — указание колонки для сортировки (слова в строке могут выступать в качестве колонок, по умолчанию разделитель — пробел)
-	-n — сортировать по числовому значению
-	-r — сортировать в обратном порядке
-	-u — не выводить повторяющиеся строки
+	*-k — указание колонки для сортировки (слова в строке могут выступать в качестве колонок, по умолчанию разделитель — пробел)
+	*-n — сортировать по числовому значению
+	*-r — сортировать в обратном порядке
+	*-u — не выводить повторяющиеся строки
 
 	Дополнительно
 
@@ -36,11 +36,11 @@ func (CommandMaker) GetCommands(sortStruct *Sort) (IComparator, []ICommand) {
 	} else {
 		comparators = DefaultSort{}
 	}
+	if ok, _ := (*sortStruct.keys)['u']; ok {
+		command = append(command, Unique{})
+	}
 	if ok, _ := (*sortStruct.keys)['r']; ok {
 		command = append(command, Reverse{})
-	}
-	if ok, _ := (*sortStruct.keys)['c']; ok {
-		command = append(command, Unique{})
 	}
 	return comparators, command
 
@@ -81,7 +81,6 @@ func (NumValueSort) Compare(a, b []rune, k int, delim rune) bool {
 		}
 		return massa > massb
 	} else {
-		//return string(a[ai:]) < string(b[bi:])
 		return !utils.StringComparator(a[ai:], b[bi:])
 	}
 }
@@ -99,15 +98,6 @@ func (DefaultSort) Compare(a, b []rune, k int, delim rune) bool {
 		return lenb == 0
 	}
 	return utils.StringComparator(a[ai:], b[bi:])
-	//for ; ai < lena && bi < lenb; ai, bi = ai+1, bi+1 {
-	//	if (a[ai] == delim || b[bi] == delim) && a[ai] != b[bi] {
-	//		return a[ai] != delim
-	//	}
-	//	if a[ai] != b[bi] {
-	//		return string(a[ai:]) < string(b[bi:])
-	//	}
-	//}
-	//return lena > lenb
 }
 
 // Reverse -r — сортировать в обратном порядке
@@ -125,13 +115,16 @@ func (Reverse) Exec(data []string) []string {
 type Unique struct{}
 
 func (Unique) Exec(data []string) []string {
-	tmp := make(map[string]struct{}, len(data))
+	tmp := make(map[string]uint32, len(data))
 	for _, v := range data {
-		tmp[v] = struct{}{}
+		tmp[v] = tmp[v] + 1
 	}
-	data = make([]string, 0, len(tmp))
-	for k, _ := range tmp {
-		data = append(data, k)
+	newData := make([]string, 0, len(tmp))
+	for _, v := range data {
+		tmp[v]--
+		if tmp[v] == 0 {
+			newData = append(newData, v)
+		}
 	}
-	return data
+	return newData
 }
