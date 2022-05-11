@@ -5,6 +5,7 @@ import (
 	ut "FindAnagram/pkg/utils"
 	"flag"
 	"fmt"
+	"time"
 )
 
 //GetInput обрабатываем флаги
@@ -20,13 +21,16 @@ func main() {
 	data := ut.ReadFromFile(filePath)
 
 	// <<< Функция поиска всех множеств анаграмм по словарю.>>>
-	result := anagram.FindAnagram(data)
+	now := time.Now()
+	result := anagram.FindAnagram(&data)
+	sub := time.Now().Sub(now)
 
 	//Выводим результат
 	for k, v := range *result {
 		fmt.Printf("Group: %s\n", k)
-		for _, v := range v {
+		for _, v := range *v {
 			fmt.Printf("\t: %s\n", v)
 		}
 	}
+	fmt.Println("обработано слов:", len(data), "\nза:", sub)
 }
