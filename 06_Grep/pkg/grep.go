@@ -42,29 +42,30 @@ import (
 */
 
 const (
-	constAlnum    = "[[:alnum:]]"
+	constAlnum  = "[[:alnum:]]"
+	constAlpha  = "[[:alpha:]]"
+	constBlank  = "[[:blank:]]"
+	constCntrl  = "[[:cntrl:]]"
+	constDigit  = "[[:digit:]]"
+	constGraph  = "[[:graph:]]"
+	constPunct  = "[[:punct:]]"
+	constLower  = "[[:lower:]]"
+	constPrint  = "[[:print:]]"
+	constSpace  = "[[:space:]]"
+	constUpper  = "[[:upper:]]"
+	constXdigit = "[[:xdigit:]]"
+
 	constAlnumEX  = "[0-9A-Za-z]"
-	constAlpha    = "[[:alpha:]]"
 	constAlphaEX  = "[A-Za-z]"
-	constBlank    = "[[:blank:]]"
-	constBlankEX  = "\t\v...." // TODO уточнить!
-	constCntrl    = "[[:cntrl:]]"
-	constCntrlEX  = "\000 - \037 \177"
-	constDigit    = "[[:digit:]]"
+	constBlankEX  = "\t\n\v\r\b\f\r"
+	constCntrlEX  = "[\000\037\177]"
 	constDigitEX  = "[0-9]"
-	constGraph    = "[[:graph:]]"
-	constGraphEX  = "[:alnum:] | [:punct:]" // TODO уточнить
-	constLower    = "[[:lower:]]"
-	constLowerEX  = "[a-z]"
-	constPrint    = "[[:print:]]"
-	constPrintEX  = "[:alnum:][:punct:]\\s" // TODO уточнить
-	constPunct    = "[:punct:]"
+	constGraphEX  = "[:alnum:]|[:punct:]"
 	constPunctEx  = "!\"#$%&'()*+,-./:;<=>?@[\\]^_`{|}~."
-	constSpace    = "[[:space:]]"
+	constLowerEX  = "[a-z]"
+	constPrintEX  = "([:alnum:]|[:punct:]| )"
 	constSpaceEX  = "\n\v\b\r "
-	constUpper    = "[[:upper:]]"
 	constUpperEX  = "[A-Z]"
-	constXdigit   = "[[:xdigit:]]"
 	constXdigitEX = "[0-9a-fA-F]"
 )
 
@@ -106,10 +107,10 @@ func prepareRequest(request string) string {
 	request = strings.ReplaceAll(request, constBlank, constBlankEX)
 	request = strings.ReplaceAll(request, constCntrl, constCntrlEX)
 	request = strings.ReplaceAll(request, constDigit, constDigitEX)
+	request = strings.ReplaceAll(request, constPunct, constPunctEx)
 	request = strings.ReplaceAll(request, constGraph, constGraphEX)
 	request = strings.ReplaceAll(request, constLower, constLowerEX)
 	request = strings.ReplaceAll(request, constPrint, constPrintEX)
-	request = strings.ReplaceAll(request, constPunct, constPunctEx)
 	request = strings.ReplaceAll(request, constSpace, constSpaceEX)
 	request = strings.ReplaceAll(request, constUpper, constUpperEX)
 	request = strings.ReplaceAll(request, constXdigit, constXdigitEX)
