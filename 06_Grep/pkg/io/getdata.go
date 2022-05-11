@@ -1,3 +1,0 @@
-package io
-
-//func GetData()

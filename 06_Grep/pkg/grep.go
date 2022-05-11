@@ -1,5 +1,14 @@
 package pkg
 
+import (
+	"fmt"
+	"grep/pkg/Config"
+	"grep/pkg/io"
+	"log"
+	"regexp"
+	"strings"
+)
+
 /*
 Наконец, определённые именованные классы символов предопределены внутри выражений в квадратных скобках как показано ниже.
 	Их интерпретация зависит от LC_CTYPE локали; например, «[[:alnum:]]» означает класс символов из чисел и букв в текущей локали.
@@ -33,29 +42,118 @@ package pkg
 */
 
 const (
-	alnum    = "[:alnum:]"
-	alnumEX  = "[0-9A-Za-z]"
-	alpha    = "[:alpha:]"
-	alphaEX  = "[A-Za-z]"
-	blank    = "[:blank:]"
-	blankEX  = "\t\v...." // TODO уточнить!
-	cntrl    = "[:cntrl:]"
-	cntrlEX  = "\000 - \037 \177"
-	digit    = "[:digit:]"
-	digitEX  = "[0-9]"
-	graph    = "[:graph:]"
-	graphEX  = "[:alnum:] | [:punct:]" // TODO уточнить
-	lower    = "[:lower:]"
-	lowerEX  = "[a-z]"
-	print    = "[:print:]"
-	printEX  = "[:alnum:][:punct:]\\s" // TODO уточнить
-	punct    = "[:punct:]"
-	punctEX  = ""
-	punctEx  = "!\"#$%&'()*+,-./:;<=>?@[\\]^_`{|}~."
-	space    = "[:space:]"
-	spaceEX  = ""
-	upper    = "[:upper:]"
-	upperEX  = ""
-	xdigit   = "[:xdigit:]"
-	xdigitEX = ""
+	constAlnum    = "[[:alnum:]]"
+	constAlnumEX  = "[0-9A-Za-z]"
+	constAlpha    = "[[:alpha:]]"
+	constAlphaEX  = "[A-Za-z]"
+	constBlank    = "[[:blank:]]"
+	constBlankEX  = "\t\v...." // TODO уточнить!
+	constCntrl    = "[[:cntrl:]]"
+	constCntrlEX  = "\000 - \037 \177"
+	constDigit    = "[[:digit:]]"
+	constDigitEX  = "[0-9]"
+	constGraph    = "[[:graph:]]"
+	constGraphEX  = "[:alnum:] | [:punct:]" // TODO уточнить
+	constLower    = "[[:lower:]]"
+	constLowerEX  = "[a-z]"
+	constPrint    = "[[:print:]]"
+	constPrintEX  = "[:alnum:][:punct:]\\s" // TODO уточнить
+	constPunct    = "[:punct:]"
+	constPunctEx  = "!\"#$%&'()*+,-./:;<=>?@[\\]^_`{|}~."
+	constSpace    = "[[:space:]]"
+	constSpaceEX  = "\n\v\b\r "
+	constUpper    = "[[:upper:]]"
+	constUpperEX  = "[A-Z]"
+	constXdigit   = "[[:xdigit:]]"
+	constXdigitEX = "[0-9a-fA-F]"
 )
+
+type Found struct {
+	*Grep
+	index int
+}
+
+func (f Found) GetData() []string {
+	var data []string
+	var start = f.index - f.cnf.KeyB
+	var finish = f.index + f.cnf.KeyA + 1
+
+	if start < 0 {
+		start = 0
+	}
+	if finish > len(f.rawData) {
+		finish = len(f.rawData)
+	}
+	if f.cnf.Keyn {
+		data = make([]string, finish-start)
+		for i := range data {
+			data = append(data, fmt.Sprintf("%d:%s", i+1, f.rawData[start]))
+		}
+		return data
+	} else {
+		return append(data, f.rawData[start:finish]...)
+	}
+}
+
+type Grep struct {
+	cnf     Config.Conf
+	rawData []string
+}
+
+func prepareRequest(request string) string {
+	request = strings.ReplaceAll(request, constAlnum, constAlnumEX)
+	request = strings.ReplaceAll(request, constAlpha, constAlphaEX)
+	request = strings.ReplaceAll(request, constBlank, constBlankEX)
+	request = strings.ReplaceAll(request, constCntrl, constCntrlEX)
+	request = strings.ReplaceAll(request, constDigit, constDigitEX)
+	request = strings.ReplaceAll(request, constGraph, constGraphEX)
+	request = strings.ReplaceAll(request, constLower, constLowerEX)
+	request = strings.ReplaceAll(request, constPrint, constPrintEX)
+	request = strings.ReplaceAll(request, constPunct, constPunctEx)
+	request = strings.ReplaceAll(request, constSpace, constSpaceEX)
+	request = strings.ReplaceAll(request, constUpper, constUpperEX)
+	request = strings.ReplaceAll(request, constXdigit, constXdigitEX)
+	return request
+}
+
+func NewGrep() *Grep {
+	cnf := Config.GetConfig()
+	var rawData = io.GetData(cnf)
+	cnf.Request = prepareRequest(cnf.Request)
+	return &Grep{cnf, rawData}
+}
+
+func (g *Grep) Run() string {
+	var found = g.findAllMatches()
+	sb := strings.Builder{}
+	for _, v := range found {
+		sb.WriteString(strings.Join(v.GetData(), "\n") + "\n")
+	}
+	return sb.String()
+}
+
+func (g *Grep) findAllMatches() (found []Found) {
+	var reg *regexp.Regexp
+	var err error
+	var pref string
+	var post string
+
+	if g.cnf.Keyi {
+		pref = "(?i)"
+	}
+	if g.cnf.KeyF {
+		pref = "^" + pref
+		post = "$"
+	}
+	reg, err = regexp.Compile(pref + g.cnf.Request + post)
+	if err != nil {
+		log.Fatal(err)
+	}
+	for i, v := range g.rawData {
+		index := reg.FindIndex([]byte(v))
+		if index != nil {
+			found = append(found, Found{g, i})
+		}
+	}
+	return found
+}

@@ -9,15 +9,16 @@ import (
 )
 
 type Conf struct {
-	A     int  // "after" печатать +N строк после совпадения
-	B     int  // "before" печатать +N строк до совпадения
-	C     int  // "context" (A+B) печатать ±N строк вокруг совпадения
-	c     bool // "count" (количество строк)
-	i     bool // "ignore-case" (игнорировать регистр)
-	v     bool // "invert" (вместо совпадения, исключать)
-	F     bool // "fixed", точное совпадение со строкой, не паттерн
-	n     bool // "line num", напечатать номер строки
-	input io.Reader
+	KeyA    int  // "after" печатать +N строк после совпадения
+	KeyB    int  // "before" печатать +N строк до совпадения
+	KeyC    int  // "context" (A+B) печатать ±N строк вокруг совпадения
+	Keyc    bool // "count" (количество строк)
+	Keyi    bool // "ignore-case" (игнорировать регистр)
+	Keyv    bool // "invert" (вместо совпадения, исключать)
+	KeyF    bool // "fixed", точное совпадение со строкой, не паттерн
+	Keyn    bool // "line num", напечатать номер строки
+	Input   io.Reader
+	Request string
 }
 
 func find(s string, haystack *[]string) (int, error) {
@@ -31,38 +32,44 @@ func find(s string, haystack *[]string) (int, error) {
 
 func GetConfig() Conf {
 	conf := Conf{}
-	flag.IntVar(&conf.A, "A", 0, "\"after\" печатать +N строк после совпадения")
-	flag.IntVar(&conf.B, "B", 0, "\"before\" печатать +N строк до совпадения")
-	flag.IntVar(&conf.C, "C", 0, "\"context\" (A+B) печатать ±N строк вокруг совпадения")
-	flag.BoolVar(&conf.c, "c", false, "\"count\" (количество строк)")
-	flag.BoolVar(&conf.i, "i", false, "\"ignore-case\" (игнорировать регистр)")
-	flag.BoolVar(&conf.v, "v", false, "\"invert\" (вместо совпадения, исключать)")
-	flag.BoolVar(&conf.F, "F", false, "\"fixed\" точное совпадение со строкой, не паттерн")
-	flag.BoolVar(&conf.n, "n", false, "\"line num\", напечатать номер строки")
+	flag.IntVar(&conf.KeyA, "A", 0, "\"after\" печатать +N строк после совпадения")
+	flag.IntVar(&conf.KeyB, "B", 0, "\"before\" печатать +N строк до совпадения")
+	flag.IntVar(&conf.KeyC, "C", 0, "\"context\" (A+B) печатать ±N строк вокруг совпадения")
+	flag.BoolVar(&conf.Keyc, "c", false, "\"count\" (количество строк)")
+	flag.BoolVar(&conf.Keyi, "i", false, "\"ignore-case\" (игнорировать регистр)")
+	flag.BoolVar(&conf.Keyv, "v", false, "\"invert\" (вместо совпадения, исключать)")
+	flag.BoolVar(&conf.KeyF, "F", false, "\"fixed\" точное совпадение со строкой, не паттерн")
+	flag.BoolVar(&conf.Keyn, "n", false, "\"line num\", напечатать номер строки")
 	flag.Parse()
-	conf.input = GetFile()
+
+	var filename string
+	conf.Request, filename = findFile()
+	conf.Input = GetFile(filename)
 	return conf
 }
 
-func findFile() *string {
+func findFile() (request, filename string) {
 	for i := 1; i < len(os.Args); i++ {
 		switch os.Args[i] {
 		case "-A", "-B", "-C":
 			i++
 		case "-c", "-i", "-v", "-F", "-n":
 		default:
-			return &os.Args[i]
+			if request == "" {
+				request = os.Args[i]
+			} else {
+				filename = os.Args[i]
+			}
 		}
 	}
-	return nil
+	return request, filename
 }
 
-func GetFile() io.Reader {
+func GetFile(filename string) io.Reader {
 	var ok error
 	var file *os.File
-	flname := findFile()
-	if flname != nil {
-		if file, ok = os.Open(*flname); ok == nil {
+	if filename != "" {
+		if file, ok = os.Open(filename); ok == nil {
 			return file
 		}
 		log.Fatal(ok)
