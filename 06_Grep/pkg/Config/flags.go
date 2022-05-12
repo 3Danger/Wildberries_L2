@@ -30,11 +30,29 @@ func find(s string, haystack *[]string) (int, error) {
 	return -1, errors.New("not found")
 }
 
+func prepareFlagsABC(conf *Conf) {
+	if conf.KeyC != -1 {
+		if conf.KeyA == -1 {
+			conf.KeyA = conf.KeyC
+		}
+		if conf.KeyB == -1 {
+			conf.KeyB = conf.KeyC
+		}
+	} else {
+		if conf.KeyA == -1 {
+			conf.KeyA = 0
+		}
+		if conf.KeyB == -1 {
+			conf.KeyB = 0
+		}
+	}
+}
+
 func GetConfig() Conf {
 	conf := Conf{}
-	flag.IntVar(&conf.KeyA, "A", 0, "\"after\" печатать +N строк после совпадения")
-	flag.IntVar(&conf.KeyB, "B", 0, "\"before\" печатать +N строк до совпадения")
-	flag.IntVar(&conf.KeyC, "C", 0, "\"context\" (A+B) печатать ±N строк вокруг совпадения")
+	flag.IntVar(&conf.KeyA, "A", -1, "\"after\" печатать +N строк после совпадения")
+	flag.IntVar(&conf.KeyB, "B", -1, "\"before\" печатать +N строк до совпадения")
+	flag.IntVar(&conf.KeyC, "C", -1, "\"context\" (A+B) печатать ±N строк вокруг совпадения")
 	flag.BoolVar(&conf.Keyc, "c", false, "\"count\" (количество строк)")
 	flag.BoolVar(&conf.Keyi, "i", false, "\"ignore-case\" (игнорировать регистр)")
 	flag.BoolVar(&conf.Keyv, "v", false, "\"invert\" (вместо совпадения, исключать)")
@@ -42,6 +60,7 @@ func GetConfig() Conf {
 	flag.BoolVar(&conf.Keyn, "n", false, "\"line num\", напечатать номер строки")
 	flag.Parse()
 
+	prepareFlagsABC(&conf)
 	var filename string
 	conf.Request, filename = findFile()
 	conf.Input = GetFile(filename)

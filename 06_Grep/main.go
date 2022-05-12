@@ -2,15 +2,15 @@ package main
 
 import (
 	"fmt"
-	"grep/pkg"
+	"grep/pkg/Grep"
 	"grep/pkg/io/file"
 	"regexp"
 )
 
 func main() {
-	grep := pkg.NewGrep()
+	grep := Grep.NewGrep()
 	run := grep.Run()
-	fmt.Println(run)
+	fmt.Print(run)
 }
 
 func test() {
