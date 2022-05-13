@@ -19,19 +19,25 @@ import (
 
 type Cut struct {
 	data []string
-	conf parse.Config
+	conf *parse.Config
 }
 
-func NewCut() Cut {
-	config := parse.GenerateConfig()
-	bytes, ok := ioutil.ReadAll(config.Read)
-	if ok != nil {
-		log.Fatal(ok)
+func NewCut(conf *parse.Config, data []string) Cut {
+	if data == nil {
+		bytes, ok := ioutil.ReadAll(conf.Read)
+		if ok != nil {
+			log.Fatal(ok)
+		}
+		return Cut{strings.Split(string(bytes), "\n"), conf}
 	}
-	return Cut{strings.Split(string(bytes), "\n"), config}
+	return Cut{data, conf}
 }
 
-func (c Cut) GetIdx(data []byte, seg [2]int) (a, b int) {
+func (c *Cut) SetData(data []string) {
+	c.data = data
+}
+
+func (c Cut) getIdx(data []byte, seg parse.Segment) (a, b int) {
 	makeId := func(data []byte, seg, def int) int {
 		for i, v := range data {
 			if seg == 1 {
@@ -43,24 +49,24 @@ func (c Cut) GetIdx(data []byte, seg [2]int) (a, b int) {
 		}
 		return def
 	}
-	a = makeId(data, seg[0], 0)
-	b = makeId(data, seg[1], len(data))
+	a = makeId(data, seg.GetA(), 0)
+	b = makeId(data, seg.GetB(), len(data))
 	return a, b
 }
 
-func (c Cut) getBytes(data []byte, segment [2]int) []byte {
+func (c Cut) getBytes(data []byte, seg parse.Segment) []byte {
 	a, b := 0, 0
-	if segment[0] == parse.INFINITY {
-		a, b = c.GetIdx(data, segment)
+	if seg.GetA() == parse.INFINITY {
+		a, b = c.getIdx(data, seg)
 		return data[:b]
-	} else if segment[1] == parse.INFINITY {
-		a, b = c.GetIdx(data, segment)
+	} else if seg.GetB() == parse.INFINITY {
+		a, b = c.getIdx(data, seg)
 		return data[a:]
-	} else if segment[1] == parse.NOTSETED {
-		a, b = c.GetIdx(data, segment)
+	} else if seg.GetB() == parse.NOTSETED {
+		a, b = c.getIdx(data, seg)
 		return data[a:b]
 	} else {
-		a, b = c.GetIdx(data, segment)
+		a, b = c.getIdx(data, seg)
 		return data[a:b]
 	}
 }

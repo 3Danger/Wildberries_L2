@@ -4,6 +4,7 @@ import (
 	"io"
 	"log"
 	"os"
+	"sort"
 	"strconv"
 	"strings"
 )
@@ -20,15 +21,52 @@ import (
 const INFINITY = -1
 const NOTSETED = -2
 
+type Segment struct {
+	a, b int
+}
+
+func (s Segment) GetA() int { return s.a }
+func (s Segment) GetB() int { return s.b }
+
+func (s Segment) isInner(oth Segment) bool {
+	return s.a <= oth.a && s.b >= oth.b
+}
+
+func (s Segment) isTouchesEdge(oth Segment) bool {
+	if s.a == INFINITY || s.a <= oth.a {
+		if s.b == INFINITY || s.b >= oth.a {
+			return true
+		}
+		return false
+	}
+	return oth.isTouchesEdge(s)
+}
+
+func (s *Segment) setIn(oth Segment) bool {
+	if s.isInner(oth) {
+		return true
+	}
+	if s.isTouchesEdge(oth) {
+		if s.a != INFINITY && s.a > oth.a {
+			s.a = oth.a
+		}
+		if s.b != INFINITY && s.b < oth.b && oth.b != NOTSETED {
+			s.b = oth.b
+		}
+		return true
+	}
+	return false
+}
+
 type Config struct {
-	F    [][2]int
+	F    []Segment
 	D    byte
 	S    bool
 	Read io.Reader
 }
 
-func GenerateConfig() Config {
-	var conf Config
+func NewConfig() *Config {
+	var conf = new(Config)
 	conf.D = '\t'
 	conf.Read = os.Stdin
 	length := len(os.Args)
@@ -52,7 +90,32 @@ func GenerateConfig() Config {
 			conf.Read = GetFile(os.Args[i])
 		}
 	}
-	return conf
+	return postScriptF(conf)
+}
+
+func postScriptF(config *Config) *Config {
+	var res []Segment
+	var tmp Segment
+	f := config.F
+	sort.Slice(f, func(i, j int) bool {
+		if f[i].a == -1 {
+			return true
+		}
+		if f[i].a == f[j].a {
+			return f[i].b < f[j].b
+		}
+		return f[i].a < f[j].a
+	})
+	tmp = f[0]
+	for _, v := range f {
+		if !tmp.setIn(v) {
+			res = append(res, tmp)
+			tmp = v
+		}
+	}
+	res = append(res, tmp)
+	config.F = res
+	return config
 }
 
 func GetFile(filePath string) io.Reader {
@@ -63,7 +126,7 @@ func GetFile(filePath string) io.Reader {
 	return open
 }
 
-func parseF(data string) (resultF [][2]int) {
+func parseF(data string) (resultF []Segment) {
 	var ok error
 	a, b := 0, 0
 	res := strings.Split(data, ",")
@@ -81,7 +144,7 @@ func parseF(data string) (resultF [][2]int) {
 				log.Fatal(ok)
 			}
 			b++
-			resultF = append(resultF, [2]int{INFINITY, b})
+			resultF = append(resultF, Segment{INFINITY, b})
 		} else {
 			if a, ok = strconv.Atoi(two[0]); ok != nil {
 				log.Fatal(ok)
@@ -99,7 +162,7 @@ func parseF(data string) (resultF [][2]int) {
 			if b != INFINITY && b != NOTSETED && a > b {
 				log.Fatal("cut: invalid decreasing range")
 			}
-			resultF = append(resultF, [2]int{a, b})
+			resultF = append(resultF, Segment{a, b})
 		}
 	}
 	return resultF

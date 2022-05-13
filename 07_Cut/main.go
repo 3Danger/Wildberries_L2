@@ -2,6 +2,7 @@ package main
 
 import (
 	"cut/pkg/cut"
+	"cut/pkg/parse"
 	"fmt"
 )
 
@@ -17,6 +18,7 @@ import (
 */
 
 func main() {
-	newCut := cut.NewCut()
-	fmt.Println(newCut.GetResult())
+	config := parse.NewConfig()
+	cut := cut.NewCut(config, nil)
+	fmt.Println(cut.GetResult())
 }
