@@ -6,29 +6,34 @@ import (
 	"sort"
 )
 
-type PointIndex struct {
-	startString, endString int
-	indexes                []int
+type Index struct {
+	index int
+	seg   [][]int
 }
 
-func (p PointIndex) isSelected(i int) bool {
-	for _, v := range p.indexes {
-		if v == i {
-			return true
+type PointIndex struct {
+	startString, endString int
+	indexes                []Index
+}
+
+func (p *PointIndex) GetIndex(j int) *Index {
+	for i := range p.indexes {
+		if p.indexes[i].index == j {
+			return &p.indexes[i]
 		}
 	}
-	return false
+	return nil
 }
 
 func (p PointIndex) GetSize() int {
 	return p.endString - p.startString
 }
 
-func NewPointIndex(index, startStr, endStr int) *PointIndex {
+func NewPointIndex(index, startStr, endStr int, seg [][]int) *PointIndex {
 	return &PointIndex{
 		startString: index - startStr,
 		endString:   index + endStr,
-		indexes:     []int{index},
+		indexes:     []Index{{index, seg}},
 	}
 }
 
@@ -38,7 +43,7 @@ func MixPoints(length int, pointIndexes ...*PointIndex) []*PointIndex {
 	}
 	var result = make([]*PointIndex, 0, len(pointIndexes))
 	sort.SliceIsSorted(pointIndexes, func(i, j int) bool {
-		return pointIndexes[i].indexes[0] > pointIndexes[j].indexes[0]
+		return pointIndexes[i].indexes[0].index > pointIndexes[j].indexes[0].index
 	})
 	var i int
 	result = append(result, pointIndexes[0])
@@ -78,23 +83,46 @@ func (f Found) GetData() []string {
 	var end = f.indexes.endString
 
 	for ; start <= end; start++ {
-		row = prepareResult(&f, start, f.data[start])
+		row = prepareResult(&f, start)
 		result = append(result, row)
 	}
 	return result
 }
 
-func prepareResult(f *Found, numRow int, row string) string {
+func prepareResult(f *Found, i int) string {
 	var prefix string
-	isSelected := f.indexes.isSelected(numRow)
+	var index *Index
+	var row = f.data[i]
+
+	index = f.indexes.GetIndex(i)
 	if f.Conf.Keyn {
-		prefix = fmt.Sprintf("\033[32m%d\033[0m", numRow)
-		if isSelected {
-			prefix += "\033[34m:\033[0m"
+		if index != nil {
+			prefix += fmt.Sprintf("\033[32m%d\033[34m:\033[0m", i)
+			return prefix + prepareRow([]byte(row), index.seg) + "\n"
 		} else {
-			prefix += "\033[34m-\033[0m"
+			prefix += fmt.Sprintf("\033[32m%d\033[34m-\033[0m", i)
 		}
 	}
 	return prefix + row + "\n"
+}
 
+func prepareRow(row []byte, seg [][]int) string {
+	var res string
+	_ = row
+	_ = seg
+	_ = res
+
+	for i := range seg {
+		if i == 0 {
+			if seg[i][0] != 0 {
+				res += "\033[0m" + string(row[:seg[i][0]])
+			}
+		} else {
+			res += "\033[0m" + string(row[seg[i-1][1]:seg[i][0]])
+		}
+		res += "\033[31m" + string(row[seg[i][0]:seg[i][1]])
+	}
+
+	res += "\033[0m" + string(row[seg[len(seg)-1][1]:])
+	return res
 }

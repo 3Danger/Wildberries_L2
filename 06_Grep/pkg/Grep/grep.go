@@ -62,9 +62,10 @@ func (g *Grep) Run() string {
 func CreateFoundGroup(g *Grep, reg *regexp.Regexp) []*Found.Found {
 	var pointIndex = make([]*Found.PointIndex, 0, 10)
 	for i, v := range g.rawData {
-		seg := reg.FindIndex([]byte(v))
+		//seg := reg.FindIndex([]byte(v))
+		seg := reg.FindAllIndex([]byte(v), -1)
 		if seg != nil {
-			pointIndex = append(pointIndex, Found.NewPointIndex(i, g.cnf.KeyB, g.cnf.KeyA))
+			pointIndex = append(pointIndex, Found.NewPointIndex(i, g.cnf.KeyB, g.cnf.KeyA, seg))
 		}
 	}
 	pointIndex = Found.MixPoints(len(g.rawData), pointIndex...)

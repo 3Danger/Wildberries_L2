@@ -1,7 +1,6 @@
 package Config
 
 import (
-	"errors"
 	"flag"
 	"io"
 	"log"
@@ -64,15 +63,6 @@ type Conf struct {
 	Keyn    bool // "line num", напечатать номер строки
 	Input   io.Reader
 	Request string
-}
-
-func find(s string, haystack *[]string) (int, error) {
-	for i, v := range *haystack {
-		if v == s {
-			return i, nil
-		}
-	}
-	return -1, errors.New("not found")
 }
 
 func prepareFlagsABC(conf *Conf) {
