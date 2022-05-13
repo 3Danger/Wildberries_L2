@@ -1,5 +1,10 @@
 package main
 
+import (
+	"cut/pkg/cut"
+	"fmt"
+)
+
 /*
 	Реализовать утилиту аналог консольной команды cut (man cut).
 	Утилита должна принимать строки через STDIN,
@@ -12,5 +17,6 @@ package main
 */
 
 func main() {
-
+	newCut := cut.NewCut()
+	fmt.Println(newCut.GetResult())
 }
