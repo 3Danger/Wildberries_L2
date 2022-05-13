@@ -28,7 +28,7 @@ const (
 	constCntrlEX  = "[\000\037\177]"
 	constDigitEX  = "[0-9]"
 	constGraphEX  = "[:alnum:]|[:punct:]"
-	constPunctEx  = "!\"#$%&'()*+,-./:;<=>?@[\\]^_`{|}~."
+	constPunctEx  = "[!\"#$%&'()*+,-./:;<=>?@[\\]^_`{|}~.]"
 	constLowerEX  = "[a-z]"
 	constPrintEX  = "([:alnum:]|[:punct:]| )"
 	constSpaceEX  = "\n\v\b\r "

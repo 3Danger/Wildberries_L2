@@ -97,10 +97,10 @@ func prepareResult(f *Found, i int) string {
 	index = f.indexes.GetIndex(i)
 	if f.Conf.Keyn {
 		if index != nil {
-			prefix += fmt.Sprintf("\033[32m%d\033[34m:\033[0m", i)
+			prefix += fmt.Sprintf("\033[32m%d\033[34m:\033[0m", i+1)
 			return prefix + prepareRow([]byte(row), index.seg) + "\n"
 		} else {
-			prefix += fmt.Sprintf("\033[32m%d\033[34m-\033[0m", i)
+			prefix += fmt.Sprintf("\033[32m%d\033[34m-\033[0m", i+1)
 		}
 	}
 	return prefix + row + "\n"
@@ -108,10 +108,6 @@ func prepareResult(f *Found, i int) string {
 
 func prepareRow(row []byte, seg [][]int) string {
 	var res string
-	_ = row
-	_ = seg
-	_ = res
-
 	for i := range seg {
 		if i == 0 {
 			if seg[i][0] != 0 {
@@ -120,7 +116,7 @@ func prepareRow(row []byte, seg [][]int) string {
 		} else {
 			res += "\033[0m" + string(row[seg[i-1][1]:seg[i][0]])
 		}
-		res += "\033[31m" + string(row[seg[i][0]:seg[i][1]])
+		res += "\033[31;1m" + string(row[seg[i][0]:seg[i][1]])
 	}
 
 	res += "\033[0m" + string(row[seg[len(seg)-1][1]:])
