@@ -1,6 +1,7 @@
 package parse
 
 import (
+	"fmt"
 	"io"
 	"log"
 	"os"
@@ -89,6 +90,10 @@ func NewConfig() *Config {
 		} else {
 			conf.Read = GetFile(os.Args[i])
 		}
+	}
+	if conf.F == nil {
+		fmt.Println("cut: you must specify a list of bytes, characters, or fields")
+		os.Exit(0)
 	}
 	return postScriptF(conf)
 }
