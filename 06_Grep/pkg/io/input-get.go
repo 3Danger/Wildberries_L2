@@ -1,11 +1,22 @@
 package io
 
 import (
-	"grep/pkg/Config"
+	"grep/pkg/Grep/Config"
 	"io/ioutil"
 	"log"
+	"os"
 	"strings"
 )
+
+func ReadFile(filePath string) []string {
+	readFile, ok := ioutil.ReadFile(filePath)
+	if ok != nil {
+		log.Fatal(ok)
+		os.Exit(1)
+	}
+	split := strings.Split(string(readFile), "\n")
+	return split
+}
 
 func GetData(conf Config.Conf) []string {
 	var (

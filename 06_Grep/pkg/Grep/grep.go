@@ -2,9 +2,8 @@ package Grep
 
 import (
 	"fmt"
-	"grep/pkg/Config"
+	"grep/pkg/Grep/Config"
 	"grep/pkg/Grep/Found"
-	"grep/pkg/Grep/Parse"
 	"grep/pkg/io"
 	"log"
 	"regexp"
@@ -22,7 +21,7 @@ func (g Grep) GetData() []string    { return g.rawData }
 func NewGrep() *Grep {
 	cnf := Config.GetConfig()
 	var rawData = io.GetData(cnf)
-	cnf.Request = Parse.PrepareRequest(cnf.Request)
+	cnf.Request = Config.PrepareRequest(cnf.Request)
 	return &Grep{cnf, rawData}
 }
 
@@ -50,7 +49,7 @@ func (g *Grep) Run() string {
 				count++
 			}
 		}
-		return fmt.Sprint(count)
+		return fmt.Sprintf("%d\n", count)
 	}
 	found := CreateFoundGroup(g, reg)
 	sb := strings.Builder{}
@@ -68,7 +67,7 @@ func CreateFoundGroup(g *Grep, reg *regexp.Regexp) []*Found.Found {
 			pointIndex = append(pointIndex, Found.NewPointIndex(i, g.cnf.KeyB, g.cnf.KeyA))
 		}
 	}
-	pointIndex = Found.MixPoints(pointIndex...)
+	pointIndex = Found.MixPoints(len(g.rawData), pointIndex...)
 	var found = make([]*Found.Found, 0, len(pointIndex))
 	for i := range pointIndex {
 		found = append(found, Found.NewFound(g.GetConf(), g.rawData, pointIndex[i]))

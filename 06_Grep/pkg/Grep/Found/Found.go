@@ -2,7 +2,7 @@ package Found
 
 import (
 	color "github.com/fatih/color"
-	"grep/pkg/Config"
+	"grep/pkg/Grep/Config"
 	"sort"
 )
 
@@ -32,7 +32,7 @@ func NewPointIndex(index, startStr, endStr int) *PointIndex {
 	}
 }
 
-func MixPoints(pointIndexes ...*PointIndex) []*PointIndex {
+func MixPoints(length int, pointIndexes ...*PointIndex) []*PointIndex {
 	if pointIndexes == nil || len(pointIndexes) == 0 {
 		return nil
 	}
@@ -42,6 +42,9 @@ func MixPoints(pointIndexes ...*PointIndex) []*PointIndex {
 	})
 	var i int
 	result = append(result, pointIndexes[0])
+	if result[0].startString < 0 {
+		result[0].startString = 0
+	}
 	for _, v := range pointIndexes[1:] {
 		if result[i].endString >= v.startString {
 			result[i].endString = v.endString
@@ -50,6 +53,9 @@ func MixPoints(pointIndexes ...*PointIndex) []*PointIndex {
 			i++
 			result = append(result, v)
 		}
+	}
+	if result[len(result)-1].endString >= length {
+		result[len(result)-1].endString = length - 1
 	}
 	return result
 }
