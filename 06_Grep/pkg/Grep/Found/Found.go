@@ -1,7 +1,7 @@
 package Found
 
 import (
-	color "github.com/fatih/color"
+	"fmt"
 	"grep/pkg/Grep/Config"
 	"sort"
 )
@@ -88,11 +88,11 @@ func prepareResult(f *Found, numRow int, row string) string {
 	var prefix string
 	isSelected := f.indexes.isSelected(numRow)
 	if f.Conf.Keyn {
-		prefix = color.GreenString("%d", numRow)
+		prefix = fmt.Sprintf("\033[32m%d\033[0m", numRow)
 		if isSelected {
-			prefix += color.BlueString("%c", ':')
+			prefix += "\033[34m:\033[0m"
 		} else {
-			prefix += color.BlueString("%c", '-')
+			prefix += "\033[34m-\033[0m"
 		}
 	}
 	return prefix + row + "\n"
