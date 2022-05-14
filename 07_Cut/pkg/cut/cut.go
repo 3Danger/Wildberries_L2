@@ -1,7 +1,7 @@
 package cut
 
 import (
-	"cut/pkg/parse"
+	"cut/pkg/cut/parse"
 	"io/ioutil"
 	"log"
 	"strings"

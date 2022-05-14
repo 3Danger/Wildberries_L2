@@ -48,7 +48,7 @@ func NewConfig() *Config {
 				conf.S = true
 			}
 		} else {
-			conf.Read = GetFile(os.Args[i])
+			conf.Read = getFile(os.Args[i])
 		}
 	}
 	if conf.F == nil {
@@ -75,6 +75,10 @@ func sortF(f [][2]int) {
 	})
 }
 
+const NOTHING = -1
+const TIRE = 0
+
+// isBetween находится ли число в пределах диапазона
 func isBetween(pair [2]int, el int) bool {
 	if (pair[0] == TIRE || pair[0] <= el) && el != TIRE {
 		if (pair[1] == TIRE || pair[1] >= el) && pair[1] != NOTHING {
@@ -84,14 +88,17 @@ func isBetween(pair [2]int, el int) bool {
 	return false
 }
 
-func isContains(a, b [2]int) bool {
-	return isBetween(a, b[0]) && isBetween(a, b[1])
-}
-
+// xor исключающий (или нет)
 func xor(a, b bool) bool {
 	return (a && !b) || (!a && b)
 }
 
+// isContains находится ли второй диапазон внутри первого диапазона
+func isContains(a, b [2]int) bool {
+	return isBetween(a, b[0]) && isBetween(a, b[1])
+}
+
+// isTouched касается ли один диапазон другого
 func isTouched(a, b [2]int) bool {
 	cmp1 := isBetween(a, b[0])
 	cmp2 := isBetween(a, b[1])
@@ -118,7 +125,8 @@ func postScriptF(config *Config) *Config {
 	return config
 }
 
-func GetFile(filePath string) io.Reader {
+// getFile Читаем данные, (с STDIN или файл, смотря что будет в интерфейсе)
+func getFile(filePath string) io.Reader {
 	open, err := os.Open(filePath)
 	if err != nil {
 		log.Fatal(err)
@@ -133,9 +141,6 @@ func atoi(s string) (res int) {
 	}
 	return res
 }
-
-const NOTHING = -1
-const TIRE = 0
 
 // parseF распарсить и отсортировать это
 func parseF(data string) (resultF [][2]int) {

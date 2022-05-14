@@ -2,7 +2,7 @@ package main
 
 import (
 	"cut/pkg/cut"
-	"cut/pkg/parse"
+	"cut/pkg/cut/parse"
 	"fmt"
 )
 
