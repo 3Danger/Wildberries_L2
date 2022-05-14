@@ -79,7 +79,6 @@ func sortF(f [][2]int) {
 func postScriptF(config *Config) *Config {
 	f := config.F
 	var res [][2]int
-	fmt.Println("aaaaaaaaaa")
 	sortF(f)
 	tmp := f[0]
 	for i, v := range f {

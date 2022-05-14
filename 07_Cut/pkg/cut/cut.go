@@ -44,6 +44,7 @@ func (c Cut) GetPoints(data []byte) []int {
 			x = append(x, i+1)
 		}
 	}
+	x = append(x, len(data))
 	return x
 }
 
@@ -54,7 +55,7 @@ func min(a, b int) int {
 	return a
 }
 
-func (c Cut) getBytes(data []byte, seg [][2]int) []byte {
+func (c Cut) getBytes(data []byte, seg [][2]int) string {
 	_, _ = data, seg
 	var res []byte
 	points := c.GetPoints(data)
@@ -62,19 +63,24 @@ func (c Cut) getBytes(data []byte, seg [][2]int) []byte {
 
 	//TODO извлечение данных по индексам
 	for _, v := range seg {
-		v[0] = min(v[0], lengthPoints-1)
 		v[1] = min(v[1], lengthPoints-1)
 		if v[0] == parse.TIRE {
 			res = append(res, data[:points[v[1]-1]+1]...)
 		} else if v[1] == parse.TIRE {
 			res = append(res, data[points[v[0]-1]:]...)
 		} else if v[1] == parse.NOTHING {
-			res = append(res, data[points[v[0]-1]])
+			if v[0] >= lengthPoints {
+				continue
+			}
+			res = append(res, data[points[v[0]-1]:points[v[0]]]...)
 		} else {
-			res = append(res, data[points[v[0]-1]:points[v[1]]-1]...)
+			if v[0] >= lengthPoints {
+				continue
+			}
+			res = append(res, data[points[v[0]-1]:points[v[1]]]...)
 		}
 	}
-	return res
+	return strings.Trim(string(res), string(c.conf.D))
 }
 
 func (c Cut) hasDelim(data []byte) bool {
