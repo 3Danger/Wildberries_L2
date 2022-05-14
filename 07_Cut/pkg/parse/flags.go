@@ -19,48 +19,8 @@ import (
 	-s - "separated" - только строки с разделителем
 */
 
-const INFINITY = -1
-const NOTSETED = -2
-
-type Segment struct {
-	a, b int
-}
-
-func (s Segment) GetA() int { return s.a }
-func (s Segment) GetB() int { return s.b }
-
-func (s Segment) isInner(oth Segment) bool {
-	return s.a <= oth.a && s.b >= oth.b
-}
-
-func (s Segment) isTouchesEdge(oth Segment) bool {
-	if s.a == INFINITY || s.a <= oth.a {
-		if s.b == INFINITY || s.b >= oth.a {
-			return true
-		}
-		return false
-	}
-	return oth.isTouchesEdge(s)
-}
-
-func (s *Segment) setIn(oth Segment) bool {
-	if s.isInner(oth) {
-		return true
-	}
-	if s.isTouchesEdge(oth) {
-		if s.a != INFINITY && s.a > oth.a {
-			s.a = oth.a
-		}
-		if s.b != INFINITY && s.b < oth.b && oth.b != NOTSETED {
-			s.b = oth.b
-		}
-		return true
-	}
-	return false
-}
-
 type Config struct {
-	F    []Segment
+	F    [][2]int
 	D    byte
 	S    bool
 	Read io.Reader
@@ -98,28 +58,45 @@ func NewConfig() *Config {
 	return postScriptF(conf)
 }
 
-func postScriptF(config *Config) *Config {
-	var res []Segment
-	var tmp Segment
-	f := config.F
+func sortF(f [][2]int) {
 	sort.Slice(f, func(i, j int) bool {
-		if f[i].a == -1 {
+		if f[i][0] == f[j][0] {
+			if f[i][1] == TIRE {
+				return false
+			} else if f[i][1] == NOTHING {
+				return true
+			}
+			return f[i][1] < f[j][1]
+		}
+		if f[i][0] == TIRE {
 			return true
 		}
-		if f[i].a == f[j].a {
-			return f[i].b < f[j].b
-		}
-		return f[i].a < f[j].a
+		return f[i][0] < f[j][0]
 	})
-	tmp = f[0]
-	for _, v := range f {
-		if !tmp.setIn(v) {
+}
+
+// postScriptF убрать дубликаты, срезы внутри среза и объединить смежные диапазоны
+func postScriptF(config *Config) *Config {
+	f := config.F
+	var res [][2]int
+	fmt.Println("aaaaaaaaaa")
+	sortF(f)
+	tmp := f[0]
+	for i, v := range f {
+		// 1-5 2-7 || 1-5 2-
+		if tmp[0] < v[0] &&
+			((tmp[1] != TIRE &&
+				tmp[1] < v[1]) ||
+				v[1] == TIRE) &&
+			v[1] != NOTHING {
+			tmp[1] = v[1]
+			// 1-5 2-2
+		} else if i != 0 {
 			res = append(res, tmp)
 			tmp = v
 		}
 	}
-	res = append(res, tmp)
-	config.F = res
+	config.F = append(res, tmp)
 	return config
 }
 
@@ -131,43 +108,42 @@ func GetFile(filePath string) io.Reader {
 	return open
 }
 
-func parseF(data string) (resultF []Segment) {
-	var ok error
-	a, b := 0, 0
-	res := strings.Split(data, ",")
-	for _, v := range res {
-		v = strings.Trim(v, " \t")
+func atoi(s string) (res int) {
+	var err error
+	if res, err = strconv.Atoi(s); err != nil {
+		log.Fatal(err)
+	}
+	return res
+}
+
+const NOTHING = -1
+const TIRE = 0
+
+// parseF распарсить и отсортировать это
+func parseF(data string) (resultF [][2]int) {
+	var pair []string
+	rows := strings.Split(data, ",")
+	for _, v := range rows {
+		// v = 1-3, -3, 4-, 5
 		if len(v) == 0 {
 			log.Fatal("cut: fields are numbered from 1")
 		}
-		two := strings.Split(v, "-")
-		if len(two) == 0 {
+		if !strings.ContainsRune(v, '-') {
+			resultF = append(resultF, [2]int{atoi(v), NOTHING})
+			continue
+		}
+		if pair = strings.Split(v, "-"); len(pair) == 0 {
 			log.Fatal("cut: invalid range with no endpoint: -")
 		}
+		// pair [0]2 - [1]9
 		if v[0] == '-' {
-			if b, ok = strconv.Atoi(two[0]); ok != nil {
-				log.Fatal(ok)
-			}
-			b++
-			resultF = append(resultF, Segment{INFINITY, b})
+			resultF = append(resultF, [2]int{TIRE, atoi(pair[0])})
 		} else {
-			if a, ok = strconv.Atoi(two[0]); ok != nil {
-				log.Fatal(ok)
-			}
-			if len(two) > 1 {
-				if b, ok = strconv.Atoi(two[1]); ok != nil {
-					log.Fatal(ok)
-				}
-				b++
-			} else if v[len(v)-1] == '-' {
-				b = INFINITY
+			if len(pair) > 1 {
+				resultF = append(resultF, [2]int{atoi(pair[0]), atoi(pair[1])})
 			} else {
-				b = NOTSETED
+				resultF = append(resultF, [2]int{atoi(pair[0]), TIRE})
 			}
-			if b != INFINITY && b != NOTSETED && a > b {
-				log.Fatal("cut: invalid decreasing range")
-			}
-			resultF = append(resultF, Segment{a, b})
 		}
 	}
 	return resultF

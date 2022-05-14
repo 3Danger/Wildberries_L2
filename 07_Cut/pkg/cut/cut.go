@@ -37,38 +37,44 @@ func (c *Cut) SetData(data []string) {
 	c.data = data
 }
 
-func (c Cut) getIdx(data []byte, seg parse.Segment) (a, b int) {
-	makeId := func(data []byte, seg, def int) int {
-		for i, v := range data {
-			if seg == 1 {
-				return i
-			}
-			if v == c.conf.D {
-				seg--
-			}
+func (c Cut) GetPoints(data []byte) []int {
+	var x = []int{0}
+	for i, v := range data {
+		if v == c.conf.D {
+			x = append(x, i+1)
 		}
-		return def
 	}
-	a = makeId(data, seg.GetA(), 0)
-	b = makeId(data, seg.GetB(), len(data))
-	return a, b
+	return x
 }
 
-func (c Cut) getBytes(data []byte, seg parse.Segment) []byte {
-	a, b := 0, 0
-	if seg.GetA() == parse.INFINITY {
-		a, b = c.getIdx(data, seg)
-		return data[:b]
-	} else if seg.GetB() == parse.INFINITY {
-		a, b = c.getIdx(data, seg)
-		return data[a:]
-	} else if seg.GetB() == parse.NOTSETED {
-		a, b = c.getIdx(data, seg)
-		return data[a:b]
-	} else {
-		a, b = c.getIdx(data, seg)
-		return data[a:b]
+func min(a, b int) int {
+	if a > b {
+		return b
 	}
+	return a
+}
+
+func (c Cut) getBytes(data []byte, seg [][2]int) []byte {
+	_, _ = data, seg
+	var res []byte
+	points := c.GetPoints(data)
+	lengthPoints := len(points)
+
+	//TODO извлечение данных по индексам
+	for _, v := range seg {
+		v[0] = min(v[0], lengthPoints-1)
+		v[1] = min(v[1], lengthPoints-1)
+		if v[0] == parse.TIRE {
+			res = append(res, data[:points[v[1]-1]+1]...)
+		} else if v[1] == parse.TIRE {
+			res = append(res, data[points[v[0]-1]:]...)
+		} else if v[1] == parse.NOTHING {
+			res = append(res, data[points[v[0]-1]])
+		} else {
+			res = append(res, data[points[v[0]-1]:points[v[1]]-1]...)
+		}
+	}
+	return res
 }
 
 func (c Cut) hasDelim(data []byte) bool {
@@ -82,29 +88,22 @@ func (c Cut) hasDelim(data []byte) bool {
 
 func (c Cut) getResultWithDelim() string {
 	var tmp = make([]string, 0, len(c.data))
-	var sb strings.Builder
 	for i := range c.data {
-		if !c.hasDelim([]byte(c.data[i])) {
-			continue
+		if c.hasDelim([]byte(c.data[i])) {
+			tmp = append(tmp, string(c.getBytes([]byte(c.data[i]), c.conf.F)))
 		}
-		for _, seg := range c.conf.F {
-			sb.WriteString(string(c.getBytes([]byte(c.data[i]), seg)))
-		}
-		tmp = append(tmp, sb.String())
-		sb.Reset()
 	}
 	return strings.Join(tmp, "\n")
 }
 
 func (c Cut) getResult() string {
 	var tmp = make([]string, 0, len(c.data))
-	var sb strings.Builder
 	for i := range c.data {
-		for _, seg := range c.conf.F {
-			sb.WriteString(string(c.getBytes([]byte(c.data[i]), seg)))
+		if c.hasDelim([]byte(c.data[i])) {
+			tmp = append(tmp, string(c.getBytes([]byte(c.data[i]), c.conf.F)))
+		} else {
+			tmp = append(tmp, c.data[i])
 		}
-		tmp = append(tmp, sb.String())
-		sb.Reset()
 	}
 	return strings.Join(tmp, "\n")
 }
