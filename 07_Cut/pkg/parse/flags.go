@@ -75,22 +75,41 @@ func sortF(f [][2]int) {
 	})
 }
 
+func isBetween(pair [2]int, el int) bool {
+	if (pair[0] == TIRE || pair[0] <= el) && el != TIRE {
+		if (pair[1] == TIRE || pair[1] >= el) && pair[1] != NOTHING {
+			return true
+		}
+	}
+	return false
+}
+
+func isContains(a, b [2]int) bool {
+	return isBetween(a, b[0]) && isBetween(a, b[1])
+}
+
+func xor(a, b bool) bool {
+	return (a && !b) || (!a && b)
+}
+
+func isTouched(a, b [2]int) bool {
+	cmp1 := isBetween(a, b[0])
+	cmp2 := isBetween(a, b[1])
+	return (cmp1 || cmp2) && xor(cmp1, cmp2)
+}
+
 // postScriptF убрать дубликаты, срезы внутри среза и объединить смежные диапазоны
 func postScriptF(config *Config) *Config {
 	f := config.F
 	var res [][2]int
 	sortF(f)
 	tmp := f[0]
-	for i, v := range f {
-		// 1-5 2-7 || 1-5 2-
-		if tmp[0] < v[0] &&
-			((tmp[1] != TIRE &&
-				tmp[1] < v[1]) ||
-				v[1] == TIRE) &&
-			v[1] != NOTHING {
+	for _, v := range f[1:] {
+		// 1-5 2-7 || 1-5 2- ... 1-5,2-4
+		if isTouched(tmp, v) {
 			tmp[1] = v[1]
 			// 1-5 2-2
-		} else if i != 0 {
+		} else if !isContains(tmp, v) {
 			res = append(res, tmp)
 			tmp = v
 		}
@@ -136,9 +155,9 @@ func parseF(data string) (resultF [][2]int) {
 		}
 		// pair [0]2 - [1]9
 		if v[0] == '-' {
-			resultF = append(resultF, [2]int{TIRE, atoi(pair[0])})
+			resultF = append(resultF, [2]int{TIRE, atoi(pair[1])})
 		} else {
-			if len(pair) > 1 {
+			if pair[len(pair)-1] != "" {
 				resultF = append(resultF, [2]int{atoi(pair[0]), atoi(pair[1])})
 			} else {
 				resultF = append(resultF, [2]int{atoi(pair[0]), TIRE})

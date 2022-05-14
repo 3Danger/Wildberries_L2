@@ -65,7 +65,7 @@ func (c Cut) getBytes(data []byte, seg [][2]int) string {
 	for _, v := range seg {
 		v[1] = min(v[1], lengthPoints-1)
 		if v[0] == parse.TIRE {
-			res = append(res, data[:points[v[1]-1]+1]...)
+			res = append(res, data[:points[v[1]]]...)
 		} else if v[1] == parse.TIRE {
 			res = append(res, data[points[v[0]-1]:]...)
 		} else if v[1] == parse.NOTHING {
@@ -106,7 +106,7 @@ func (c Cut) getResult() string {
 	var tmp = make([]string, 0, len(c.data))
 	for i := range c.data {
 		if c.hasDelim([]byte(c.data[i])) {
-			tmp = append(tmp, string(c.getBytes([]byte(c.data[i]), c.conf.F)))
+			tmp = append(tmp, c.getBytes([]byte(c.data[i]), c.conf.F))
 		} else {
 			tmp = append(tmp, c.data[i])
 		}
