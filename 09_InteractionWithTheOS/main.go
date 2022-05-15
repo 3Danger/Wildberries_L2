@@ -28,13 +28,6 @@ import (
 */
 
 func main() {
-	p := make([]int, 2)
-	syscall.Pipe(p)
-	syscall.Write(p[1], []byte("Hello"))
-	b := make([]byte, 20)
-	syscall.Read(p[0], b)
-	fmt.Println(string(b))
-
 	input_processing.ReadLine()
 	//pid, _, _ := syscall.Syscall(syscall.SYS_FORK, 0, 0, 0)
 	//if pid == 0 {
@@ -46,7 +39,6 @@ func main() {
 	//}
 	//syscall.Wait4(int(pid), nil, 0, nil)
 	//
-	fmt.Println("after")
 	//fmt.Println(exec.Command("cat").Output())
 
 	//fmt.Println("BEFORE exec")

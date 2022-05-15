@@ -6,7 +6,7 @@ type Ps struct {
 	common.Command
 }
 
-func (p Ps) Run() (pid uintptr, ok error) {
+func (p Ps) Run() (ok error) {
 
-	return 0, nil
+	return nil
 }

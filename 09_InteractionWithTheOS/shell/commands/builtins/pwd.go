@@ -8,7 +8,7 @@ type Pwd struct {
 	common.Command
 }
 
-func (p Pwd) Run() (pid uintptr, ok error) {
+func (p Pwd) Run() (ok error) {
 
-	return 0, nil
+	return nil
 }

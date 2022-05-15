@@ -18,7 +18,7 @@ func ReadLine() {
 		//}
 		//fmt.Println(string(line))
 		//cmds, err := parse.CreateCommands(string(line), shl.Paths())
-		cmds, err := parse.CreateCommands("ls -la | echo", shl.Paths())
+		cmds, err := parse.CreateCommands("ls -la | cat -e", shl.Paths())
 		if err != nil {
 			log.Fatal(err)
 		}

@@ -52,6 +52,9 @@ func CreateCommands(input string, paths []string) (cms []commands.ICommand, ok e
 		pipeSplit := customSplit(group, "|", ignore)
 		for _, cmdline := range pipeSplit {
 			args := customSplit(cmdline, " ", ignore)
+			//if ok = syscall.SetNonblock(in, true); ok != nil {
+			//	log.Fatal(ok)
+			//}
 			cmd, err := createCommand(args, paths, out, in)
 			if err != nil {
 				return nil, err

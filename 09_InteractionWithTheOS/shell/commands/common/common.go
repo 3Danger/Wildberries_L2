@@ -14,6 +14,15 @@ type Command struct {
 	env    []string
 	writer int
 	reader int
+	pid    uintptr
+}
+
+func (c *Command) Pid() uintptr {
+	return c.pid
+}
+
+func (c *Command) SetFd(pid uintptr) {
+	c.pid = pid
 }
 
 func (c *Command) Args() []string {
@@ -37,7 +46,7 @@ func (c *Command) SetReader(reader int) {
 }
 
 func NewCommand(args, env []string, writer, reader int) *Command {
-	return &Command{args, env, writer, reader}
+	return &Command{args, env, writer, reader, 0}
 }
 
 func (c Command) DupAll() (ok error) {
@@ -47,6 +56,12 @@ func (c Command) DupAll() (ok error) {
 	if ok = syscall.Dup2(c.reader, 0); ok != nil {
 		return ok
 	}
+	//if ok = syscall.Close(c.writer); ok != nil {
+	//	log.Fatal(ok)
+	//}
+	//if ok = syscall.Close(c.reader); ok != nil {
+	//	log.Fatal(ok)
+	//}
 	return nil
 }
 
@@ -55,9 +70,9 @@ func (c Command) ForkMe() (pid uintptr) {
 	return pid
 }
 
-func (c Command) Run() (pid uintptr, ok error) {
+func (c *Command) Run() (ok error) {
 	fmt.Println("start", c.args[0])
-	pid = c.ForkMe()
+	pid := c.ForkMe()
 	if pid == 0 {
 		if ok = c.DupAll(); ok != nil {
 			log.Fatal(ok)
@@ -67,5 +82,12 @@ func (c Command) Run() (pid uintptr, ok error) {
 		}
 		os.Exit(1)
 	}
-	return pid, nil
+	if ok = syscall.Close(c.writer); ok != nil {
+		log.Fatal(ok)
+	}
+	if ok = syscall.Close(c.reader); ok != nil {
+		log.Fatal(ok)
+	}
+	c.SetFd(pid)
+	return nil
 }

@@ -12,13 +12,13 @@ type Cd struct {
 	common.Command
 }
 
-func (c Cd) Run() (uintptr, error) {
+func (c Cd) Run() (ok error) {
 	args := c.Args()
 	if len(args) != 2 {
-		return 0, errors.New("cd: too many arguments")
+		return errors.New("cd: too many arguments")
 	}
 	if ok := os.Chdir(args[1]); ok != nil {
-		return 0, errors.New("cd: " + ok.Error())
+		return errors.New("cd: " + ok.Error())
 	}
-	return 0, nil
+	return nil
 }

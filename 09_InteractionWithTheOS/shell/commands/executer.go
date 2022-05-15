@@ -1,18 +1,18 @@
 package commands
 
 import (
-	"fmt"
 	"log"
 	"syscall"
 	"time"
 )
 
 type ICommand interface {
-	Run() (uintptr, error)
+	Run() error
 	Writer() int
 	SetWriter(int)
 	Reader() int
 	SetReader(int)
+	Pid() uintptr
 }
 
 func ExecuteAll(executable []ICommand) {
@@ -23,9 +23,9 @@ func ExecuteAll(executable []ICommand) {
 	)
 	for _, e := range executable {
 		time.Sleep(time.Second)
-		if pid, ok = e.Run(); ok != nil {
+		if ok = e.Run(); ok != nil {
 			log.Fatal(ok)
-		} else if pid > 0 {
+		} else if pid = e.Pid(); pid > 0 {
 			pids = append(pids, pid)
 		}
 	}
@@ -33,6 +33,6 @@ func ExecuteAll(executable []ICommand) {
 		if _, ok = syscall.Wait4(int(pid), nil, 0, nil); ok != nil {
 			log.Fatal(ok)
 		}
-		fmt.Println(pid, "is done")
+		//fmt.Println(pid, "is done")
 	}
 }
