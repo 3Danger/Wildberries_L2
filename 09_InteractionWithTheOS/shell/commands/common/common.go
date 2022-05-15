@@ -1,6 +1,7 @@
 package common
 
 import (
+	"fmt"
 	"log"
 	"os"
 	"syscall"
@@ -40,10 +41,10 @@ func NewCommand(args, env []string, writer, reader int) *Command {
 }
 
 func (c Command) DupAll() (ok error) {
-	if ok = syscall.Dup2(c.writer, 0); ok != nil {
+	if ok = syscall.Dup2(c.writer, 1); ok != nil {
 		return ok
 	}
-	if ok = syscall.Dup2(c.reader, 1); ok != nil {
+	if ok = syscall.Dup2(c.reader, 0); ok != nil {
 		return ok
 	}
 	return nil
@@ -55,6 +56,7 @@ func (c Command) ForkMe() (pid uintptr) {
 }
 
 func (c Command) Run() (pid uintptr, ok error) {
+	fmt.Println("start", c.args[0])
 	pid = c.ForkMe()
 	if pid == 0 {
 		if ok = c.DupAll(); ok != nil {

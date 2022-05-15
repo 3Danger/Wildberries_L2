@@ -2,7 +2,6 @@ package parse
 
 import (
 	"errors"
-	"log"
 	"microshell/shell/commands"
 	"microshell/shell/commands/builtins"
 	"microshell/shell/commands/common"
@@ -40,40 +39,33 @@ func customSplit(data, delim, ignore string) (result []string) {
 func CreateCommands(input string, paths []string) (cms []commands.ICommand, ok error) {
 	const ignore = "\"'"
 	var pipex = make([]int, 2)
-	var std = make([]int, 2)
 	var out, in int
 
 	if ok = syscall.Pipe(pipex); ok != nil {
 		return nil, ok
 	}
-	if std[0], ok = syscall.Dup(0); ok != nil {
-		log.Fatal(ok)
-	}
-	if std[1], ok = syscall.Dup(1); ok != nil {
-		log.Fatal(ok)
-	}
 
-	out = std[1]
-	in = pipex[1]
+	out = pipex[1]
+	in = 0
 	groups := customSplit(input, ";", ignore)
 	for _, group := range groups {
 		pipeSplit := customSplit(group, "|", ignore)
 		for _, cmdline := range pipeSplit {
 			args := customSplit(cmdline, " ", ignore)
-			cmd, err := createCommand(args, paths, in, out)
+			cmd, err := createCommand(args, paths, out, in)
 			if err != nil {
 				return nil, err
 			}
 			cms = append(cms, cmd)
 
-			out = pipex[0]
+			in = pipex[0]
 			if ok = syscall.Pipe(pipex); ok != nil {
 				return nil, ok
 			}
-			in = pipex[1]
+			out = pipex[1]
 		}
-		in = std[1]
-		cms[len(cms)-1].SetWriter(in)
+		out = 1
+		cms[len(cms)-1].SetWriter(out)
 	}
 	return cms, nil
 }
