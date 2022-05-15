@@ -56,13 +56,22 @@ func (c Command) DupAll() (ok error) {
 	if ok = syscall.Dup2(c.reader, 0); ok != nil {
 		return ok
 	}
-	//if ok = syscall.Close(c.writer); ok != nil {
-	//	log.Fatal(ok)
-	//}
-	//if ok = syscall.Close(c.reader); ok != nil {
-	//	log.Fatal(ok)
-	//}
+	c.CloseFds()
 	return nil
+}
+
+func (c Command) CloseFds() {
+	var ok error
+	if c.writer != 1 {
+		if ok = syscall.Close(c.writer); ok != nil {
+			log.Fatal(ok)
+		}
+	}
+	if c.reader != 0 {
+		if ok = syscall.Close(c.reader); ok != nil {
+			log.Fatal(ok)
+		}
+	}
 }
 
 func (c Command) ForkMe() (pid uintptr) {
@@ -82,12 +91,7 @@ func (c *Command) Run() (ok error) {
 		}
 		os.Exit(1)
 	}
-	if ok = syscall.Close(c.writer); ok != nil {
-		log.Fatal(ok)
-	}
-	if ok = syscall.Close(c.reader); ok != nil {
-		log.Fatal(ok)
-	}
+	c.CloseFds()
 	c.SetFd(pid)
 	return nil
 }

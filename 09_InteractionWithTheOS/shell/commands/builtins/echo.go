@@ -29,9 +29,6 @@ func (e *Echo) Run() (ok error) {
 	//if ok = syscall.Fchmod(e.Writer(), syscall.O_NONBLOCK); ok != nil {
 	//	log.Fatal(ok)
 	//}
-	if ok = syscall.SetNonblock(e.Reader(), true); ok != nil {
-		log.Fatal(ok)
-	}
 	n, ok = syscall.Read(e.Reader(), buf)
 	for n > 0 && ok == nil {
 		if _, ok = syscall.Write(e.Writer(), buf); ok != nil {

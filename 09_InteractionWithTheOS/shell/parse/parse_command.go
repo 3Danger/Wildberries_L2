@@ -2,6 +2,7 @@ package parse
 
 import (
 	"errors"
+	"log"
 	"microshell/shell/commands"
 	"microshell/shell/commands/builtins"
 	"microshell/shell/commands/common"
@@ -40,35 +41,34 @@ func CreateCommands(input string, paths []string) (cms []commands.ICommand, ok e
 	const ignore = "\"'"
 	var pipex = make([]int, 2)
 	var out, in int
+	var cmd commands.ICommand
 
 	if ok = syscall.Pipe(pipex); ok != nil {
 		return nil, ok
 	}
 
 	out = pipex[1]
-	in = 0
 	groups := customSplit(input, ";", ignore)
 	for _, group := range groups {
+		in = 0
 		pipeSplit := customSplit(group, "|", ignore)
 		for _, cmdline := range pipeSplit {
 			args := customSplit(cmdline, " ", ignore)
-			//if ok = syscall.SetNonblock(in, true); ok != nil {
-			//	log.Fatal(ok)
-			//}
-			cmd, err := createCommand(args, paths, out, in)
-			if err != nil {
-				return nil, err
+			if cmd, ok = createCommand(args, paths, out, in); ok != nil {
+				return nil, ok
 			}
 			cms = append(cms, cmd)
-
 			in = pipex[0]
 			if ok = syscall.Pipe(pipex); ok != nil {
 				return nil, ok
 			}
 			out = pipex[1]
 		}
-		out = 1
-		cms[len(cms)-1].SetWriter(out)
+		if ok = syscall.Close(cms[len(cms)-1].Writer()); ok != nil {
+			log.Fatal(ok)
+		}
+		cms[len(cms)-1].SetWriter(1)
+		out = pipex[1]
 	}
 	return cms, nil
 }

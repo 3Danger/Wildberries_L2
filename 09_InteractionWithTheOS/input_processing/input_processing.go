@@ -9,21 +9,21 @@ import (
 )
 
 func ReadLine() {
+	var i int
 	//reader := bufio.NewReader(os.Stdin)
 	shl := shell.NewShell()
-	for {
+	for i < 1 {
 		//line, _, err := reader.ReadLine()
 		//if err != nil {
 		//	return
 		//}
-		//fmt.Println(string(line))
 		//cmds, err := parse.CreateCommands(string(line), shl.Paths())
-		cmds, err := parse.CreateCommands("ls -la | cat -e", shl.Paths())
+		cmds, err := parse.CreateCommands("ls; ls -la | cat -e; cat -e | cat -e | cat -e", shl.Paths())
 		if err != nil {
 			log.Fatal(err)
 		}
 		commands.ExecuteAll(cmds)
 		time.Sleep(time.Second * 2)
-		return
+		i++
 	}
 }

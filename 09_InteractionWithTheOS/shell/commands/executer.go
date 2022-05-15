@@ -3,7 +3,6 @@ package commands
 import (
 	"log"
 	"syscall"
-	"time"
 )
 
 type ICommand interface {
@@ -22,7 +21,6 @@ func ExecuteAll(executable []ICommand) {
 		pids []uintptr
 	)
 	for _, e := range executable {
-		time.Sleep(time.Second)
 		if ok = e.Run(); ok != nil {
 			log.Fatal(ok)
 		} else if pid = e.Pid(); pid > 0 {
