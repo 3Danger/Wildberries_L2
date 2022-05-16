@@ -16,6 +16,7 @@ func (e *Echo) Run(group *sync.WaitGroup) (ok error) {
 		wasFlagN bool
 		x        = 1
 	)
+	defer group.Done()
 	wasFlagN = isFlagN(e.Args())
 	if wasFlagN {
 		x++
@@ -29,7 +30,7 @@ func (e *Echo) Run(group *sync.WaitGroup) (ok error) {
 		}
 	}
 	e.CloseFds()
-	group.Done()
+
 	return nil
 }
 

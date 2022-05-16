@@ -1,14 +1,11 @@
 package builtins
 
 import (
-	"errors"
-	"log"
+	"fmt"
 	"microshell/shell/commands/common"
-	"os/exec"
+	"os"
 	"strconv"
-	"strings"
 	"sync"
-	"syscall"
 )
 
 type Kill struct {
@@ -17,31 +14,44 @@ type Kill struct {
 
 func (k *Kill) Run(group *sync.WaitGroup) (ok error) {
 	var (
-		pid    int
-		PsList string
-		tmp    []byte
+		pid  int
+		args []string
+		proc *os.Process
 	)
-	args := k.Args()
-	if tmp, ok = exec.Command("ps", "-a").Output(); ok != nil {
-		log.Fatal(ok)
-	}
-	PsList = string(tmp)
-	_ = PsList
-	for _, killingApp := range args[1:] {
-		appList := strings.Split(PsList, "\n")
-		for _, strokeApp := range appList {
-			if strings.HasSuffix(strokeApp, killingApp) {
-				strokeApp = strings.TrimLeft(strokeApp, " \t")
-				sp := strings.IndexByte(strokeApp, byte(' '))
-				if pid, ok = strconv.Atoi(strokeApp[:sp]); ok != nil {
-					log.Fatal(ok)
-				} else if ok = syscall.Kill(pid, syscall.SIGKILL); ok != nil {
-					return errors.New("kill: " + ok.Error())
+	k.CloseFds()
+	defer group.Done()
+	args = k.Args()
+	if len(args) > 1 {
+		for _, v := range args[1:] {
+			if pid, ok = strconv.Atoi(v); ok != nil {
+				fmt.Println("kill: pid:", v, "is not valid")
+			} else {
+				if proc, ok = os.FindProcess(pid); ok != nil {
+					fmt.Println("kill:", pid, "not found")
+				} else if ok = proc.Kill(); ok != nil {
+					fmt.Println("kill: " + ok.Error())
 				}
 			}
 		}
 	}
-	k.CloseFds()
-	group.Done()
+
 	return nil
 }
+
+//func killByName(appnames, applist []string) (ok error) {
+//	var pid int
+//	for _, killingApp := range appnames {
+//		for _, strokeApp := range applist {
+//			if strings.HasSuffix(strokeApp, killingApp) {
+//				strokeApp = strings.TrimLeft(strokeApp, " \t")
+//				sp := strings.IndexByte(strokeApp, byte(' '))
+//				if pid, ok = strconv.Atoi(strokeApp[:sp]); ok != nil {
+//					log.Fatal(ok)
+//				} else if ok = syscall.Kill(pid, syscall.SIGKILL); ok != nil {
+//					return errors.New("kill: " + ok.Error())
+//				}
+//			}
+//		}
+//	}
+//	return nil
+//}

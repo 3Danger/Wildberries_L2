@@ -13,23 +13,25 @@ import (
 )
 
 func customSplit(data, delim, ignore string) (result []string) {
-	var ignored bool
+	var ign, ign2 bool
 	var pnt int
 	var i int
 
 	data = strings.Trim(data, delim)
 	for ; i < len(data); i++ {
-		if strings.ContainsRune(ignore, rune(data[i])) && (i == 0 || data[i-1] != '\\') {
-			ignored = !ignored
+		if strings.ContainsRune(ignore, rune(data[i])) && (i == 0 || ign || data[i-1] != '\\') {
+			ign = !ign
+			ign2 = true
 		}
-		if !ignored {
-			if strings.ContainsRune(delim, rune(data[i])) && (i == 0 || data[i-1] != '\\') {
+		if !ign {
+			if strings.ContainsRune(delim, rune(data[i])) && (i == 0 || ign2 || data[i-1] != '\\') {
 				result = append(result, data[pnt:i])
 				for i+1 < len(data) && strings.ContainsRune(delim, rune(data[i+1])) {
 					i++
 				}
 				pnt = i + 1
 			}
+			ign2 = false
 		}
 	}
 	if i != pnt {
@@ -55,6 +57,11 @@ func CreateCommands(input string, paths []string) (cms []commands.ICommand, ok e
 		pipeSplit := customSplit(group, "|", ignore)
 		for _, cmdline := range pipeSplit {
 			args := customSplit(cmdline, " ", ignore)
+			for i := range args {
+				args[i] = strings.TrimFunc(args[i], func(r rune) bool {
+					return r == '\'' || r == '"'
+				})
+			}
 			if cmd, ok = createCommand(args, paths, out, in); ok != nil {
 				fmt.Printf("%s\n", ok.Error())
 				return nil, nil

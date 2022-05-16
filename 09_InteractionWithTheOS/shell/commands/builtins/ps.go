@@ -12,5 +12,6 @@ type Ps struct {
 func (p Ps) Run(group *sync.WaitGroup) (ok error) {
 
 	group.Done()
+	p.CloseFds()
 	return nil
 }
