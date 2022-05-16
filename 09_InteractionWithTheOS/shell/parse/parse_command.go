@@ -2,6 +2,7 @@ package parse
 
 import (
 	"errors"
+	"fmt"
 	"log"
 	"microshell/shell/commands"
 	"microshell/shell/commands/builtins"
@@ -55,7 +56,8 @@ func CreateCommands(input string, paths []string) (cms []commands.ICommand, ok e
 		for _, cmdline := range pipeSplit {
 			args := customSplit(cmdline, " ", ignore)
 			if cmd, ok = createCommand(args, paths, out, in); ok != nil {
-				return nil, ok
+				fmt.Printf("%s\n", ok.Error())
+				return nil, nil
 			}
 			cms = append(cms, cmd)
 			in = pipex[0]
@@ -88,20 +90,22 @@ func checkFile(ut string) (res string, notOk error) {
 func createCommand(args, paths []string, writer, reader int) (res commands.ICommand, notOk error) {
 	switch args[0] {
 	case "cd":
-		return &builtins.Cd{Command: *common.NewCommand(args, os.Environ(), writer, reader)}, nil
+		return &builtins.Cd{Command: *common.NewCommand(args, writer, reader)}, nil
 	case "pwd":
-		return &builtins.Pwd{Command: *common.NewCommand(args, os.Environ(), writer, reader)}, nil
+		return &builtins.Pwd{Command: *common.NewCommand(args, writer, reader)}, nil
 	case "echo":
-		return &builtins.Echo{Command: *common.NewCommand(args, os.Environ(), writer, reader)}, nil
+		return &builtins.Echo{Command: *common.NewCommand(args, writer, reader)}, nil
 	case "kill":
-		return &builtins.Kill{Command: *common.NewCommand(args, os.Environ(), writer, reader)}, nil
+		return &builtins.Kill{Command: *common.NewCommand(args, writer, reader)}, nil
 	case "ps":
-		return &builtins.Ps{Command: *common.NewCommand(args, os.Environ(), writer, reader)}, nil
+		return &builtins.Ps{Command: *common.NewCommand(args, writer, reader)}, nil
+	case "exec":
+		return &builtins.Exec{Command: *common.NewCommand(args, writer, reader)}, nil
 	}
 	for _, v := range paths {
 		if _, notOk = checkFile(v + "/" + args[0]); notOk == nil {
 			args[0] = v + "/" + args[0]
-			return common.NewCommand(args, os.Environ(), writer, reader), nil
+			return common.NewCommand(args, writer, reader), nil
 		}
 	}
 	return nil, errors.New(args[0] + ": command not found")

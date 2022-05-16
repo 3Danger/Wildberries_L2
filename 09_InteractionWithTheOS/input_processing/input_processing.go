@@ -1,29 +1,36 @@
 package input_processing
 
 import (
+	"bufio"
 	"log"
-	"microshell/shell"
 	"microshell/shell/commands"
 	"microshell/shell/parse"
-	"time"
+	"os"
+	"strings"
 )
 
 func ReadLine() {
-	var i int
-	//reader := bufio.NewReader(os.Stdin)
-	shl := shell.NewShell()
-	for i < 1 {
-		//line, _, err := reader.ReadLine()
-		//if err != nil {
-		//	return
-		//}
-		//cmds, err := parse.CreateCommands(string(line), shl.Paths())
-		cmds, err := parse.CreateCommands("ls; ls -la | cat -e; cat -e | cat -e | cat -e", shl.Paths())
-		if err != nil {
-			log.Fatal(err)
+	const prefix = "\033[1;31m $> \033[0m "
+	var (
+		ok    error
+		line  []byte
+		cmds  []commands.ICommand
+		paths []string
+	)
+	env := os.Getenv("PATH")
+	if env != "" {
+		paths = strings.Split(env, ":")
+	}
+	reader := bufio.NewReader(os.Stdin)
+	for {
+		print(prefix)
+		if line, _, ok = reader.ReadLine(); ok != nil {
+			log.Fatal(ok)
+		} else if string(line) == "\\quit" {
+			break
+		} else if cmds, ok = parse.CreateCommands(string(line), paths); ok != nil {
+			log.Fatal(ok)
 		}
 		commands.ExecuteAll(cmds)
-		time.Sleep(time.Second * 2)
-		i++
 	}
 }

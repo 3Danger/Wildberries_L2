@@ -1,9 +1,9 @@
 package builtins
 
 import (
-	"fmt"
 	"log"
 	"microshell/shell/commands/common"
+	"sync"
 	"syscall"
 )
 
@@ -11,37 +11,25 @@ type Echo struct {
 	common.Command
 }
 
-func (e *Echo) Run() (ok error) {
+func (e *Echo) Run(group *sync.WaitGroup) (ok error) {
 	var (
-		n   int
-		buf = make([]byte, 1)
+		wasFlagN bool
+		x        = 1
 	)
-	fmt.Println("start", e.Args()[0])
-	//pid := e.ForkMe()
-	//if pid == 0 {
-	//	if ok = e.DupAll(); ok != nil {
-	//		log.Fatal()
-	//	}
-	//if ok = syscall.Fchmod()
-	//if ok = syscall.Fchmod(e.Reader(), syscall.O_NONBLOCK); ok != nil {
-	//	log.Fatal(ok)
-	//}
-	//if ok = syscall.Fchmod(e.Writer(), syscall.O_NONBLOCK); ok != nil {
-	//	log.Fatal(ok)
-	//}
-	n, ok = syscall.Read(e.Reader(), buf)
-	for n > 0 && ok == nil {
-		if _, ok = syscall.Write(e.Writer(), buf); ok != nil {
+	wasFlagN = isFlagN(e.Args())
+	if wasFlagN {
+		x++
+	}
+	if _, ok = syscall.Write(e.Writer(), []byte(e.Args()[x])); ok != nil {
+		log.Fatal(ok)
+	}
+	if !wasFlagN {
+		if _, ok = syscall.Write(e.Writer(), []byte{'\n'}); ok != nil {
 			log.Fatal(ok)
 		}
-		n, ok = syscall.Read(e.Reader(), buf)
 	}
-	if !isFlagN(e.Args()) {
-		syscall.Write(e.Writer(), []byte{'\n'})
-	}
-	//os.Exit(0)
-	//}
-	//e.SetFd(pid)
+	e.CloseFds()
+	group.Done()
 	return nil
 }
 

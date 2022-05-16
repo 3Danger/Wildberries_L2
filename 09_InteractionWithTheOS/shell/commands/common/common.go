@@ -1,9 +1,9 @@
 package common
 
 import (
-	"fmt"
 	"log"
 	"os"
+	"sync"
 	"syscall"
 )
 
@@ -11,7 +11,6 @@ import (
 
 type Command struct {
 	args   []string
-	env    []string
 	writer int
 	reader int
 	pid    uintptr
@@ -45,8 +44,8 @@ func (c *Command) SetReader(reader int) {
 	c.reader = reader
 }
 
-func NewCommand(args, env []string, writer, reader int) *Command {
-	return &Command{args, env, writer, reader, 0}
+func NewCommand(args []string, writer, reader int) *Command {
+	return &Command{args, writer, reader, 0}
 }
 
 func (c Command) DupAll() (ok error) {
@@ -79,19 +78,19 @@ func (c Command) ForkMe() (pid uintptr) {
 	return pid
 }
 
-func (c *Command) Run() (ok error) {
-	fmt.Println("start", c.args[0])
+func (c *Command) Run(group *sync.WaitGroup) (ok error) {
 	pid := c.ForkMe()
 	if pid == 0 {
 		if ok = c.DupAll(); ok != nil {
 			log.Fatal(ok)
 		}
-		if ok = syscall.Exec(c.args[0], c.args, c.env); ok != nil {
+		if ok = syscall.Exec(c.args[0], c.args, os.Environ()); ok != nil {
 			log.Fatal(ok)
 		}
 		os.Exit(1)
 	}
 	c.CloseFds()
 	c.SetFd(pid)
+	group.Done()
 	return nil
 }
