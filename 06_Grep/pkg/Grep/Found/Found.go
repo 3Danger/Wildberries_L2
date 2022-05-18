@@ -103,7 +103,7 @@ func prepareResult(f *Found, i int) string {
 			prefix += fmt.Sprintf("\033[32m%d\033[34m-\033[0m", i+1)
 		}
 	}
-	return prefix + row + "\n"
+	return prefix + prepareRow([]byte(row), index.seg) + "\n"
 }
 
 func prepareRow(row []byte, seg [][]int) string {
