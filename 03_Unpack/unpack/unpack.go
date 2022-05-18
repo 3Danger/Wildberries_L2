@@ -5,7 +5,7 @@ import (
 	"strings"
 )
 
-type block struct {
+type Block struct {
 	char  byte
 	count int
 }
@@ -20,8 +20,8 @@ func isBlock(rune []byte, i int) bool {
 		(i == 0 || rune[i-1] == '\\')
 }
 
-func getBlock(rune []byte) (block, int) {
-	b := block{rune[0], 1}
+func getBlock(rune []byte) (Block, int) {
+	b := Block{rune[0], 1}
 	i := 1
 	for ; i < len(rune); i++ {
 		if !isNum(rune[i]) {
@@ -36,8 +36,8 @@ func getBlock(rune []byte) (block, int) {
 	return b, 0
 }
 
-func getBlocks(rune []byte) []block {
-	blocks := make([]block, 0)
+func getBlocks(rune []byte) []Block {
+	blocks := make([]Block, 0)
 
 	if isNum(rune[0]) {
 		return nil
