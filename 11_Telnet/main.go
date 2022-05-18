@@ -3,10 +3,7 @@ package main
 import (
 	"fmt"
 	"os"
-	"regexp"
-	"strconv"
-	"strings"
-	"time"
+	"wget/pkg/telnet"
 )
 
 /*
@@ -31,47 +28,11 @@ go-telnet --timeout=3s 1.1.1.1 123
 	При подключении к несуществующему сервер, программа должна завершаться через timeout
 */
 
-type Config struct {
-	TimeOut    time.Duration
-	Host, Port *string
-}
-
-func GetArgs() (conf Config) {
-	var (
-		tmreg, numreg     *regexp.Regexp
-		tmIndex, numIndex []int
-		host, port, tmp   string
-		ok                error
-		tm                time.Duration
-	)
-
-	numreg, ok = regexp.Compile("\\d+")
-	tmreg, ok = regexp.Compile("(ms|m|s)$")
-
-	const timeoutFlag = "-timeout="
-	for i := 1; i < len(os.Args); i++ {
-		if n := strings.Index(os.Args[i], timeoutFlag); n > 0 {
-			if tmIndex = tmreg.FindIndex([]byte(os.Args[i])); tmIndex == nil {
-				fmt.Println("wrong argument near " + timeoutFlag)
-				os.Exit(0)
-			}
-			num, _ := strconv.Atoi(os.Args[i][tmIndex[0]:tmIndex[1]])
-			if numIndex = numreg.FindIndex([]byte(os.Args[i])); numIndex == nil {
-				tm = time.Second * time.Duration(num)
-			} else {
-				switch os.Args[i][numIndex[0]:numIndex[1]] {
-				case "ms":
-					tm = time.Millisecond * time.Duration(num)
-				case "m":
-					tm = time.Minute * time.Duration(num)
-				default:
-					tm = time.Second * time.Duration(num)
-				}
-			}
-		}
-	}
-}
-
 func main() {
-
+	connection, err := telnet.NewConnection(os.Stdin, os.Stdout)
+	if err != nil {
+		fmt.Println(err)
+		return
+	}
+	connection.Run()
 }
