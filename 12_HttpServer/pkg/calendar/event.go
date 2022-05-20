@@ -26,6 +26,11 @@ func NewEvents() *Events {
 	return &Events{&sync.RWMutex{}, make(map[string]*Event)}
 }
 
+func (es *Events) Update(e *Event) {
+	//TODO "implement this method"
+	panic("implement this method")
+}
+
 func (es *Events) Add(e *Event) {
 	es.Lock()
 	es.data[e.ID] = e
@@ -45,4 +50,17 @@ func (es *Events) GetEvent(id string) *Event {
 	es.RLock()
 	defer es.RUnlock()
 	return es.data[id]
+}
+
+func (es *Events) GetEvents(user_id string, start, end time.Time) (ev []Event) {
+	es.RLock()
+	for _, v := range es.data {
+		if v.UserID == user_id {
+			if (v.Date == start || v.Date.After(start)) && v.Date.Before(end) {
+				ev = append(ev, *v)
+			}
+		}
+	}
+	es.RUnlock()
+	return ev
 }

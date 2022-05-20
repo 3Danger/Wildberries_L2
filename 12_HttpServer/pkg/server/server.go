@@ -30,7 +30,11 @@ func (s *Server) Run() {
 		Addr:    "localhost:8080",
 		Handler: s.routing,
 	}
-	create := &handler.CreateEvent{Events: s.events}
-	s.HandlerIt(create)
+	s.HandlerIt(&handler.CreateEvent{Events: s.events})
+	s.HandlerIt(&handler.UpdateEvent{Events: s.events})
+	s.HandlerIt(&handler.DeleteEvent{Events: s.events})
+	s.HandlerIt(&handler.EventsForDay{Events: s.events})
+	s.HandlerIt(&handler.EventsForWeek{Events: s.events})
+	s.HandlerIt(&handler.EventsForMonth{Events: s.events})
 	log.Fatal(srv.ListenAndServe())
 }
