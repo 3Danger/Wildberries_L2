@@ -13,7 +13,6 @@ import (
 	1. Упрощает добавление операций, работающих со сложными структурами объектов.
 	2. Объединяет родственные операции в одном классе.
 	3. Посетитель может накапливать состояние при обходе структуры элементов.
-
 Минусы:
 	1. Паттерн не оправдан, если иерархия элементов часто меняется.
 	2. Может привести к нарушению инкапсуляции элементов.
@@ -34,9 +33,12 @@ type IVisitorShape interface {
 // VisitorShapeToPrint Структура реализующая интерфейс выше
 type VisitorShapeToPrint struct{}
 
+//VisitRectangle посещает объект типа Rectangle
 func (VisitorShapeToPrint) VisitRectangle(rectangle *Rectangle) {
 	fmt.Printf("Visitor visited Rectangle: %+v\n", *rectangle)
 }
+
+//VisitCircle посещает объект типа Circle
 func (VisitorShapeToPrint) VisitCircle(circle *Circle) {
 	fmt.Printf("Visitor visited Circle: %+v\n", *circle)
 }
@@ -46,7 +48,11 @@ type Shapes struct {
 	rectangle Rectangle
 	circle    Circle
 }
+
+// Rectangle объект прямоугольника
 type Rectangle struct{ width, height float32 }
+
+// Circle объект круга
 type Circle struct{ radius float32 }
 
 // Visit 	---> Принимает интерфейс посетителя <---
