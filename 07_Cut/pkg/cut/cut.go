@@ -17,11 +17,13 @@ import (
 	-s - "separated" - только строки с разделителем
 */
 
+//Cut структура с данными о массиве строк для их обработки
 type Cut struct {
 	data []string
 	conf *parse.Config
 }
 
+//NewCut конструктор для Cut
 func NewCut(conf *parse.Config, data []string) Cut {
 	if data == nil {
 		bytes, ok := ioutil.ReadAll(conf.Read)
@@ -33,10 +35,12 @@ func NewCut(conf *parse.Config, data []string) Cut {
 	return Cut{data, conf}
 }
 
+//SetData сеттер для массива строк
 func (c *Cut) SetData(data []string) {
 	c.data = data
 }
 
+//GetPoints получение массива индексов
 func (c Cut) GetPoints(data []byte) []int {
 	var x = []int{0}
 	for i, v := range data {
@@ -48,6 +52,7 @@ func (c Cut) GetPoints(data []byte) []int {
 	return x
 }
 
+//Min получение наименьшего числа из двух
 func min(a, b int) int {
 	if a > b {
 		return b
@@ -55,13 +60,14 @@ func min(a, b int) int {
 	return a
 }
 
+//GetBytes извлечение данных по отрезкам индексов
 func (c Cut) getBytes(data []byte, seg [][2]int) string {
 	_, _ = data, seg
 	var res []byte
 	points := c.GetPoints(data)
 	lengthPoints := len(points)
 
-	//TODO извлечение данных по индексам
+	// извлечение данных по индексам
 	for _, v := range seg {
 		v[1] = min(v[1], lengthPoints-1)
 		if v[0] == parse.TIRE {
@@ -83,6 +89,7 @@ func (c Cut) getBytes(data []byte, seg [][2]int) string {
 	return strings.Trim(string(res), string(c.conf.D))
 }
 
+//HasDelim проверка на наличие разделитель в массиве
 func (c Cut) hasDelim(data []byte) bool {
 	for _, v := range data {
 		if c.conf.D == v {
@@ -96,7 +103,7 @@ func (c Cut) getResultWithDelim() string {
 	var tmp = make([]string, 0, len(c.data))
 	for i := range c.data {
 		if c.hasDelim([]byte(c.data[i])) {
-			tmp = append(tmp, string(c.getBytes([]byte(c.data[i]), c.conf.F)))
+			tmp = append(tmp, c.getBytes([]byte(c.data[i]), c.conf.F))
 		}
 	}
 	return strings.Join(tmp, "\n")
@@ -114,6 +121,7 @@ func (c Cut) getResult() string {
 	return strings.Join(tmp, "\n")
 }
 
+//GetResult получить результат
 func (c Cut) GetResult() string {
 	if c.conf.S {
 		return c.getResultWithDelim()

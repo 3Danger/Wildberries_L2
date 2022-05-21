@@ -19,6 +19,7 @@ import (
 	-s - "separated" - только строки с разделителем
 */
 
+//Config хранение данных о флагах
 type Config struct {
 	F    [][2]int
 	D    byte
@@ -26,6 +27,7 @@ type Config struct {
 	Read io.Reader
 }
 
+// NewConfig создание новой структуры с получением данных из аргументов
 func NewConfig() *Config {
 	var conf = new(Config)
 	conf.D = '\t'
@@ -75,7 +77,10 @@ func sortF(f [][2]int) {
 	})
 }
 
+//NOTHING если не было указано второе число
 const NOTHING = -1
+
+//TIRE если до или после '-' не было числа
 const TIRE = 0
 
 // isBetween находится ли число в пределах диапазона
