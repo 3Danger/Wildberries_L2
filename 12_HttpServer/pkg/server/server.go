@@ -13,7 +13,7 @@ type IHandler interface {
 }
 
 type Server struct {
-	events  *calendar.Events
+	events  *calendar.EventsManager
 	routing *http.ServeMux
 }
 
@@ -30,11 +30,11 @@ func (s *Server) Run() {
 		Addr:    "localhost:8080",
 		Handler: s.routing,
 	}
-	s.HandlerIt(&handler.CreateEvent{Events: s.events})
-	s.HandlerIt(&handler.UpdateEvent{Events: s.events})
-	s.HandlerIt(&handler.DeleteEvent{Events: s.events})
-	s.HandlerIt(&handler.EventsForDay{Events: s.events})
-	s.HandlerIt(&handler.EventsForWeek{Events: s.events})
-	s.HandlerIt(&handler.EventsForMonth{Events: s.events})
+	s.HandlerIt(&handler.CreateEvent{EventsManager: s.events})
+	s.HandlerIt(&handler.UpdateEvent{EventsManager: s.events})
+	s.HandlerIt(&handler.DeleteEvent{EventsManager: s.events})
+	s.HandlerIt(&handler.EventsForDay{EventsManager: s.events})
+	s.HandlerIt(&handler.EventsForWeek{EventsManager: s.events})
+	s.HandlerIt(&handler.EventsForMonth{EventsManager: s.events})
 	log.Fatal(srv.ListenAndServe())
 }

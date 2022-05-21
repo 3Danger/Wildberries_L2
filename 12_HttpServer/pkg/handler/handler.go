@@ -46,7 +46,7 @@ func jsonResponse(err bool, w http.ResponseWriter, code int, msg interface{}) {
 
 // CreateEvent POST
 type CreateEvent struct {
-	*calendar.Events
+	*calendar.EventsManager
 }
 
 // Pattern return this http map
@@ -61,32 +61,38 @@ func (c *CreateEvent) Hand(w http.ResponseWriter, r *http.Request) {
 	ev := EventModel{}
 	if err := json.NewDecoder(r.Body).Decode(&ev); err != nil {
 		jsonResponse(true, w, http.StatusBadRequest, err.Error())
-		return
-	}
-	if !ev.Validate() {
+	} else if !ev.Validate() {
 		jsonResponse(true, w, http.StatusBadRequest, "user_id is empty or date wasn't formatted")
-		return
+	} else {
+		ev.ID = uid.New().String()
+		c.Add(ev.ToEvent())
+		jsonResponse(false, w, http.StatusOK, "created")
 	}
-	ev.ID = uid.New().String()
-	c.Add(ev.ToEvent())
-	jsonResponse(false, w, http.StatusOK, "created")
 }
 
 // UpdateEvent POST
 type UpdateEvent struct {
-	*calendar.Events
-}
-
-func (e UpdateEvent) Hand(w http.ResponseWriter, r *http.Request) {
-	//TODO implement me
-	panic("implement me")
+	*calendar.EventsManager
 }
 
 func (UpdateEvent) Pattern() string { return "/update_event" }
+func (e UpdateEvent) Hand(w http.ResponseWriter, r *http.Request) {
+	if r.Method != "POST" {
+		jsonResponse(true, w, http.StatusMethodNotAllowed, fmt.Sprintf("bad %v method", r.Method))
+	}
+	ev := EventModel{}
+	if ok := json.NewDecoder(r.Body).Decode(&ev); ok != nil {
+		jsonResponse(true, w, http.StatusBadRequest, ok.Error())
+	} else if ok := e.UpdateEvent(ev.ToEvent()); ok != nil {
+		jsonResponse(true, w, http.StatusBadRequest, ok.Error())
+	} else {
+		jsonResponse(false, w, http.StatusOK, "updated")
+	}
+}
 
 // DeleteEvent POST
 type DeleteEvent struct {
-	*calendar.Events
+	*calendar.EventsManager
 }
 
 func (DeleteEvent) Pattern() string { return "/delete_event" }
@@ -102,26 +108,25 @@ func (e *DeleteEvent) Hand(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 	if ok := e.DeleteEvent(ev.ID); !ok {
-		jsonResponse(true, w, http.StatusNotFound, ev.ID)
+		jsonResponse(true, w, http.StatusNotFound, "not found")
 		return
 	}
-	jsonResponse(false, w, http.StatusOK, ev.ID+" deleted")
+	jsonResponse(false, w, http.StatusOK, "deleted")
 }
 
 // EventsForDay GET
 type EventsForDay struct {
-	*calendar.Events
+	*calendar.EventsManager
 }
 
 func (EventsForDay) Pattern() string { return "/events_for_day" }
-
 func (d *EventsForDay) Hand(w http.ResponseWriter, r *http.Request) {
 	if ValidateQuery(w, r, "GET", "user_id", "date") {
 		if date, ok := time.Parse("2006-01-02", r.URL.Query().Get("date")); ok != nil {
 			jsonResponse(true, w, http.StatusBadRequest, ok.Error())
 		} else {
 			userId := r.URL.Query().Get("user_id")
-			evs := d.Events.GetEvents(userId, date, date.AddDate(0, 0, 1))
+			evs := d.EventsManager.GetEvents(userId, date, date.AddDate(0, 0, 1))
 			jsonResponse(false, w, http.StatusOK, evs)
 		}
 	}
@@ -129,7 +134,7 @@ func (d *EventsForDay) Hand(w http.ResponseWriter, r *http.Request) {
 
 // EventsForWeek GET
 type EventsForWeek struct {
-	*calendar.Events
+	*calendar.EventsManager
 }
 
 func (EventsForWeek) Pattern() string { return "/events_for_week" }
@@ -139,7 +144,7 @@ func (w2 EventsForWeek) Hand(w http.ResponseWriter, r *http.Request) {
 			jsonResponse(true, w, http.StatusBadRequest, ok.Error())
 		} else {
 			userId := r.URL.Query().Get("user_id")
-			evs := w2.Events.GetEvents(userId, date, date.AddDate(0, 0, 7))
+			evs := w2.EventsManager.GetEvents(userId, date, date.AddDate(0, 0, 7))
 			jsonResponse(false, w, http.StatusOK, evs)
 		}
 	}
@@ -147,7 +152,7 @@ func (w2 EventsForWeek) Hand(w http.ResponseWriter, r *http.Request) {
 
 // EventsForMonth GET
 type EventsForMonth struct {
-	*calendar.Events
+	*calendar.EventsManager
 }
 
 func (m EventsForMonth) Hand(w http.ResponseWriter, r *http.Request) {
@@ -156,7 +161,7 @@ func (m EventsForMonth) Hand(w http.ResponseWriter, r *http.Request) {
 			jsonResponse(true, w, http.StatusBadRequest, ok.Error())
 		} else {
 			userId := r.URL.Query().Get("user_id")
-			evs := m.Events.GetEvents(userId, date, date.AddDate(0, 1, 0))
+			evs := m.EventsManager.GetEvents(userId, date, date.AddDate(0, 1, 0))
 			jsonResponse(false, w, http.StatusOK, evs)
 		}
 	}

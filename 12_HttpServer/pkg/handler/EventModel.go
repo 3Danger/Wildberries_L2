@@ -17,7 +17,7 @@ func (e EventModel) Validate() bool {
 	if _, ok := time.Parse("2006-01-02", e.Date); ok != nil {
 		return false
 	}
-	return !(e.Date == "" || e.UserID == "" || e.Title == "")
+	return !(e.UserID == "" || e.Title == "")
 }
 
 func (e *EventModel) ToEvent() *calendar.Event {
