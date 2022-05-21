@@ -24,22 +24,30 @@ type State interface {
 	Off() error
 }
 
-// On Off возможные состоянии лампочки
+// On состояние для лампочки
 type On struct{}
+
+// Off состояние для лампочки
 type Off struct{}
 
 // On Off Различное поведение в зависимости от состояния
 func (On) On() error {
 	return errors.New(Red("err light bulb is already on"))
 }
+
+// Off Различное поведение в зависимости от состояния
 func (On) Off() error {
 	fmt.Println(Grn("light bulb is switched OFF"))
 	return nil
 }
+
+// On Различное поведение в зависимости от состояния
 func (Off) On() error {
 	fmt.Println(Grn("light bulb is switched ON!"))
 	return nil
 }
+
+// Off Различное поведение в зависимости от состояния
 func (Off) Off() error {
 	return errors.New(Red("err light bulb is already off"))
 }
@@ -49,17 +57,20 @@ type LightBulb struct {
 	state State
 }
 
+// NewLightBulb конструктор
 func NewLightBulb() *LightBulb {
 	return &LightBulb{Off{}}
 }
 
-// On Off Переключение состояний
+// On Переключение состояний
 func (l *LightBulb) On() (ok error) {
 	if ok = l.state.On(); ok == nil {
 		l.state = On{}
 	}
 	return ok
 }
+
+// Off Переключение состояний
 func (l *LightBulb) Off() (ok error) {
 	if ok = l.state.Off(); ok == nil {
 		l.state = Off{}
@@ -100,6 +111,8 @@ func main() {
 
 }
 
-// Red Grn Цвета для удобного чтения
+// Red Цвета для удобного чтения
 func Red(s string) string { return "\033[0;31m" + s + "\033[0;0m" }
+
+// Grn Цвета для удобного чтения
 func Grn(s string) string { return "\033[0;32m" + s + "\033[0;0m" }
