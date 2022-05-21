@@ -2,11 +2,9 @@ package main
 
 import (
 	"fmt"
-	"grep/pkg/Grep"
+	"grep/pkg/grep"
 )
 
 func main() {
-	grep := Grep.NewGrep()
-	run := grep.Run()
-	fmt.Print(run)
+	fmt.Print(grep.NewGrep().Run())
 }

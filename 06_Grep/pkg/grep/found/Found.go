@@ -1,21 +1,24 @@
-package Found
+package found
 
 import (
 	"fmt"
-	"grep/pkg/Grep/Config"
+	"grep/pkg/grep/config"
 	"sort"
 )
 
+//Index найденные индексы и отрезки в них
 type Index struct {
 	index int
 	seg   [][]int
 }
 
+//PointIndex слайс найденных индексов
 type PointIndex struct {
 	startString, endString int
 	indexes                []Index
 }
 
+//GetIndex получить конкретный индекс с отрезком в ней
 func (p *PointIndex) GetIndex(j int) *Index {
 	for i := range p.indexes {
 		if p.indexes[i].index == j {
@@ -25,10 +28,12 @@ func (p *PointIndex) GetIndex(j int) *Index {
 	return nil
 }
 
+//GetSize получить размер (диапазона)
 func (p PointIndex) GetSize() int {
 	return p.endString - p.startString
 }
 
+//NewPointIndex конструктор
 func NewPointIndex(index, startStr, endStr int, seg [][]int) *PointIndex {
 	return &PointIndex{
 		startString: index - startStr,
@@ -37,6 +42,7 @@ func NewPointIndex(index, startStr, endStr int, seg [][]int) *PointIndex {
 	}
 }
 
+//MixPoints нахождение всех пересекающихся поинтов и их объединение при необходимости
 func MixPoints(length int, pointIndexes ...*PointIndex) []*PointIndex {
 	if pointIndexes == nil || len(pointIndexes) == 0 {
 		return nil
@@ -65,17 +71,20 @@ func MixPoints(length int, pointIndexes ...*PointIndex) []*PointIndex {
 	return result
 }
 
+//Found найденные данные будут сохранены в этой структуре
 type Found struct {
-	Conf Config.Conf
+	Conf config.Conf
 	data []string
 
 	indexes *PointIndex
 }
 
-func NewFound(conf Config.Conf, data []string, indexes *PointIndex) *Found {
+//NewFound конструктор
+func NewFound(conf config.Conf, data []string, indexes *PointIndex) *Found {
 	return &Found{conf, data, indexes}
 }
 
+//GetData подготовка результата
 func (f Found) GetData() []string {
 	var result []string
 	var row string
@@ -99,9 +108,8 @@ func prepareResult(f *Found, i int) string {
 		if index != nil {
 			prefix += fmt.Sprintf("\033[32m%d\033[34m:\033[0m", i+1)
 			return prefix + prepareRow([]byte(row), index.seg) + "\n"
-		} else {
-			prefix += fmt.Sprintf("\033[32m%d\033[34m-\033[0m", i+1)
 		}
+		prefix += fmt.Sprintf("\033[32m%d\033[34m-\033[0m", i+1)
 	}
 	return prefix + prepareRow([]byte(row), index.seg) + "\n"
 }

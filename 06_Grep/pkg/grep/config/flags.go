@@ -1,4 +1,4 @@
-package Config
+package config
 
 import (
 	"flag"
@@ -36,6 +36,7 @@ const (
 	constXdigitEX = "[0-9a-fA-F]"
 )
 
+//PrepareRequest подготовка запроса под подходящий формат для Regex
 func PrepareRequest(request string) string {
 	request = strings.ReplaceAll(request, constAlnum, constAlnumEX)
 	request = strings.ReplaceAll(request, constAlpha, constAlphaEX)
@@ -52,6 +53,7 @@ func PrepareRequest(request string) string {
 	return request
 }
 
+//Conf набор флагов
 type Conf struct {
 	KeyA    int  // "after" печатать +N строк после совпадения
 	KeyB    int  // "before" печатать +N строк до совпадения
@@ -83,6 +85,7 @@ func prepareFlagsABC(conf *Conf) {
 	}
 }
 
+//GetConfig парсинг флагов и возвращает конфигурацию флагов
 func GetConfig() Conf {
 	conf := Conf{}
 	flag.IntVar(&conf.KeyA, "A", -1, "\"after\" печатать +N строк после совпадения")
@@ -119,6 +122,7 @@ func findFile() (request, filename string) {
 	return request, filename
 }
 
+//GetFile определяет откуда будут получены данные
 func GetFile(filename string) io.Reader {
 	var ok error
 	var file *os.File

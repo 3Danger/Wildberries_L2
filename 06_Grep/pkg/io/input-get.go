@@ -1,13 +1,14 @@
 package io
 
 import (
-	"grep/pkg/Grep/Config"
+	"grep/pkg/grep/config"
 	"io/ioutil"
 	"log"
 	"strings"
 )
 
-func GetData(conf Config.Conf) []string {
+//GetData чтение данных
+func GetData(conf config.Conf) []string {
 	var (
 		raw []byte
 		ok  error
