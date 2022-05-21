@@ -7,6 +7,7 @@ import (
 	"time"
 )
 
+// CreateEvent обработчик паттерна /create_event для создания событий в календаре
 func (s *Server) CreateEvent(w http.ResponseWriter, r *http.Request) {
 	if ValidateQuery(w, r, http.MethodPost) {
 		ev := EventModel{}
@@ -22,6 +23,7 @@ func (s *Server) CreateEvent(w http.ResponseWriter, r *http.Request) {
 	}
 }
 
+// UpdateEvent обработчик паттерна /update_event для изменения/обновления событий в календаре
 func (s *Server) UpdateEvent(w http.ResponseWriter, r *http.Request) {
 	if ValidateQuery(w, r, http.MethodPost) {
 		ev := EventModel{}
@@ -35,6 +37,7 @@ func (s *Server) UpdateEvent(w http.ResponseWriter, r *http.Request) {
 	}
 }
 
+// DeleteEvent удаляет событие по ID который в теле запроса
 func (s *Server) DeleteEvent(w http.ResponseWriter, r *http.Request) {
 	if ValidateQuery(w, r, http.MethodPost) {
 		ev := EventModel{}
@@ -50,37 +53,40 @@ func (s *Server) DeleteEvent(w http.ResponseWriter, r *http.Request) {
 	}
 }
 
+// EventsForDay Получаем событие за день
 func (s *Server) EventsForDay(w http.ResponseWriter, r *http.Request) {
 	if ValidateQuery(w, r, http.MethodGet, "user_id", "date") {
 		if date, ok := time.Parse("2006-01-02", r.URL.Query().Get("date")); ok != nil {
 			jsonResponse(true, w, http.StatusServiceUnavailable, ok.Error())
 		} else {
-			userId := r.URL.Query().Get("user_id")
-			evs := s.events.GetEvents(userId, date, date.AddDate(0, 0, 1))
+			userID := r.URL.Query().Get("user_id")
+			evs := s.events.GetEvents(userID, date, date.AddDate(0, 0, 1))
 			jsonResponse(false, w, http.StatusOK, evs)
 		}
 	}
 }
 
+// EventsForWeek Получаем событие за неделю
 func (s *Server) EventsForWeek(w http.ResponseWriter, r *http.Request) {
 	if ValidateQuery(w, r, http.MethodGet, "user_id", "date") {
 		if date, ok := time.Parse("2006-01-02", r.URL.Query().Get("date")); ok != nil {
 			jsonResponse(true, w, http.StatusServiceUnavailable, ok.Error())
 		} else {
-			userId := r.URL.Query().Get("user_id")
-			evs := s.events.GetEvents(userId, date, date.AddDate(0, 0, 7))
+			userID := r.URL.Query().Get("user_id")
+			evs := s.events.GetEvents(userID, date, date.AddDate(0, 0, 7))
 			jsonResponse(false, w, http.StatusOK, evs)
 		}
 	}
 }
 
+// EventsForMonth Получаем событие за месяц
 func (s *Server) EventsForMonth(w http.ResponseWriter, r *http.Request) {
 	if ValidateQuery(w, r, http.MethodGet, "user_id", "date") {
 		if date, ok := time.Parse("2006-01-02", r.URL.Query().Get("date")); ok != nil {
 			jsonResponse(true, w, http.StatusBadRequest, ok.Error())
 		} else {
-			userId := r.URL.Query().Get("user_id")
-			evs := s.events.GetEvents(userId, date, date.AddDate(0, 1, 0))
+			userID := r.URL.Query().Get("user_id")
+			evs := s.events.GetEvents(userID, date, date.AddDate(0, 1, 0))
 			jsonResponse(false, w, http.StatusOK, evs)
 		}
 	}

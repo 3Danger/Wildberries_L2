@@ -5,6 +5,7 @@ import (
 	"time"
 )
 
+// Event наша целевая структура для хранения единицы информации
 type Event struct {
 	sync.Mutex
 	ID          string    `json:"id"`
@@ -14,6 +15,7 @@ type Event struct {
 	Description string    `json:"description"`
 }
 
+// NewEvent создаем пустой event
 func NewEvent() *Event {
 	return new(Event)
 }

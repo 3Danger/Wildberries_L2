@@ -5,6 +5,7 @@ import (
 	"time"
 )
 
+// EventModel промежуточная модель для временного сохранения данных с клиента
 type EventModel struct {
 	ID          string `json:"id"`
 	Date        string `json:"date"`
@@ -13,6 +14,7 @@ type EventModel struct {
 	Description string `json:"description"`
 }
 
+// Validate валидация ключевых параметров
 func (e EventModel) Validate() bool {
 	if _, ok := time.Parse("2006-01-02", e.Date); ok != nil {
 		return false
@@ -20,6 +22,7 @@ func (e EventModel) Validate() bool {
 	return !(e.UserID == "" || e.Title == "")
 }
 
+// ToEvent конвертация в целевую структуру
 func (e *EventModel) ToEvent() *calendar.Event {
 	event := calendar.NewEvent()
 	event.ID = e.ID

@@ -33,6 +33,7 @@ func jsonResponse(err bool, w http.ResponseWriter, code int, msg interface{}) {
 	}
 }
 
+// ValidateQuery для валидации метода и URL-query
 func ValidateQuery(w http.ResponseWriter, r *http.Request, validateQuery ...string) bool {
 	if r.Method != validateQuery[0] {
 		jsonResponse(true, w, http.StatusMethodNotAllowed, fmt.Sprintf("bad %v method", r.Method))

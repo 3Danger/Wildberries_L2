@@ -1,27 +1,30 @@
 package calendar
 
 import (
-	"errors"
 	"fmt"
 	"sync"
 	"time"
 )
 
+// EventsManager менеджер событий, по сути выполняет основную роль календаря
 type EventsManager struct {
 	*sync.RWMutex
 	data map[string]*Event
 }
 
-func NewEvents() *EventsManager {
+// NewEventsManager создаем менеджера
+func NewEventsManager() *EventsManager {
 	return &EventsManager{&sync.RWMutex{}, make(map[string]*Event)}
 }
 
+// Add Добавляет событие в календарь
 func (es *EventsManager) Add(e *Event) {
 	es.Lock()
 	es.data[e.ID] = e
 	es.Unlock()
 }
 
+// DeleteEvent удаляет событие из календаря если таковой имеется
 func (es *EventsManager) DeleteEvent(id string) (ok bool) {
 	es.Lock()
 	if _, ok = es.data[id]; ok {
@@ -31,16 +34,18 @@ func (es *EventsManager) DeleteEvent(id string) (ok bool) {
 	return ok
 }
 
+// GetEvent находит событие по ID
 func (es *EventsManager) GetEvent(id string) *Event {
 	es.RLock()
 	defer es.RUnlock()
 	return es.data[id]
 }
 
+// UpdateEvent Обновляет событие если оно имеется
 func (es *EventsManager) UpdateEvent(e *Event) (ok error) {
 	curEv := es.GetEvent(e.ID)
 	if curEv == nil {
-		return errors.New(fmt.Sprintf("event id with: %s - not found", e.ID))
+		return fmt.Errorf("event id with: %s - not found", e.ID)
 	}
 	if e.Title != "" {
 		curEv.Lock()
@@ -65,10 +70,11 @@ func (es *EventsManager) UpdateEvent(e *Event) (ok error) {
 	return nil
 }
 
-func (es *EventsManager) GetEvents(userId string, start, end time.Time) (ev []*Event) {
+// GetEvents получаем все события за промежуток времени
+func (es *EventsManager) GetEvents(userID string, start, end time.Time) (ev []*Event) {
 	es.RLock()
 	for _, v := range es.data {
-		if v.UserID == userId {
+		if v.UserID == userID {
 			if (v.Date == start || v.Date.After(start)) && v.Date.Before(end) {
 				ev = append(ev, v)
 			}
