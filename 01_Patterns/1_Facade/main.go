@@ -1,8 +1,8 @@
 package main
 
 import (
-	"Front/src/Animal"
-	"Front/src/Job"
+	"Front/src/animal"
+	"Front/src/job"
 	"sync"
 )
 
@@ -30,9 +30,9 @@ func DoIt() {
 	wg.Add(3)
 
 	//DoItWork Это наш фасад найма на работу, и начала работы
-	go Job.DoItWork(&wg, Job.NewDancerJob(), Animal.NewElephant())
-	go Job.DoItWork(&wg, Job.NewLoaderJob(), Animal.NewBull())
-	go Job.DoItWork(&wg, Job.NewPosterJob(), Animal.NewMonkey())
+	go job.DoItWork(&wg, job.NewDancerJob(), animal.NewElephant())
+	go job.DoItWork(&wg, job.NewLoaderJob(), animal.NewBull())
+	go job.DoItWork(&wg, job.NewPosterJob(), animal.NewMonkey())
 	wg.Wait()
 }
 
