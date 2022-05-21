@@ -2,27 +2,26 @@ package server
 
 import (
 	"httpServer/pkg/calendar"
-	"httpServer/pkg/handler"
 	"log"
 	"net/http"
+	"time"
 )
-
-type IHandler interface {
-	Hand(w http.ResponseWriter, r *http.Request)
-	Pattern() string
-}
 
 type Server struct {
 	events  *calendar.EventsManager
 	routing *http.ServeMux
 }
 
-func (s *Server) HandlerIt(handler IHandler) {
-	s.routing.HandleFunc(handler.Pattern(), handler.Hand)
-}
-
 func NewServer() *Server {
 	return &Server{calendar.NewEvents(), http.NewServeMux()}
+}
+
+func MiddleWare(next http.HandlerFunc) http.HandlerFunc {
+	return func(w http.ResponseWriter, r *http.Request) {
+		start := time.Now()
+		next(w, r)
+		log.Printf("%s, %s, %s\n", r.Method, r.URL, time.Since(start))
+	}
 }
 
 func (s *Server) Run() {
@@ -30,11 +29,12 @@ func (s *Server) Run() {
 		Addr:    "localhost:8080",
 		Handler: s.routing,
 	}
-	s.HandlerIt(&handler.CreateEvent{EventsManager: s.events})
-	s.HandlerIt(&handler.UpdateEvent{EventsManager: s.events})
-	s.HandlerIt(&handler.DeleteEvent{EventsManager: s.events})
-	s.HandlerIt(&handler.EventsForDay{EventsManager: s.events})
-	s.HandlerIt(&handler.EventsForWeek{EventsManager: s.events})
-	s.HandlerIt(&handler.EventsForMonth{EventsManager: s.events})
+	s.routing.HandleFunc("/create_event", MiddleWare(s.CreateEvent))
+	s.routing.HandleFunc("/update_event", MiddleWare(s.UpdateEvent))
+	s.routing.HandleFunc("/delete_event", MiddleWare(s.DeleteEvent))
+	s.routing.HandleFunc("/events_for_day", MiddleWare(s.EventsForDay))
+	s.routing.HandleFunc("/events_for_week", MiddleWare(s.EventsForWeek))
+	s.routing.HandleFunc("/events_for_month", MiddleWare(s.EventsForMonth))
+	log.Println("start server")
 	log.Fatal(srv.ListenAndServe())
 }
