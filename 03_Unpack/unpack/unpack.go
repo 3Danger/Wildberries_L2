@@ -5,8 +5,11 @@ import (
 	"strings"
 )
 
+//Block структура для хранения информации о конкретном блоке (k || r3)
 type Block struct {
-	char  byte
+	//Symbol
+	char byte
+	//Number to repeat of symbol
 	count int
 }
 
@@ -56,6 +59,7 @@ func getBlocks(rune []byte) []Block {
 	return blocks
 }
 
+//Unpack распаковка строки
 func Unpack(rune *string) string {
 	if *rune == "" {
 		return ""
