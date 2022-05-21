@@ -1,7 +1,7 @@
 package main
 
 import (
-	"Builder/pkg/Address"
+	"Builder/pkg/address"
 )
 
 /*
@@ -22,7 +22,7 @@ import (
 */
 
 func main() {
-	address := Address.NewAddressBuilder().
+	addr := address.NewBuilder().
 		SetUserName("csamuro").
 		SetCountry("Russia").
 		SetRegion("Tatarstan").
@@ -31,5 +31,5 @@ func main() {
 		SetCity("Kazan").
 		SetHome("44B").
 		Build()
-	address.PrintInfo()
+	addr.PrintInfo()
 }
