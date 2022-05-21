@@ -40,6 +40,7 @@ func customSplit(data, delim, ignore string) (result []string) {
 	return result
 }
 
+//CreateCommands парсит и создает команды
 func CreateCommands(input string, paths []string) (cms []commands.ICommand, ok error) {
 	const ignore = "\"'"
 	var pipex = make([]int, 2)

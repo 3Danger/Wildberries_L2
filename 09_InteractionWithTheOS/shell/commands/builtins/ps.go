@@ -9,10 +9,12 @@ import (
 	"syscall"
 )
 
+//Ps структура реализующая утилиту ps
 type Ps struct {
 	common.Command
 }
 
+//Run запуск этой утилиты
 func (p Ps) Run(group *sync.WaitGroup) (ok error) {
 	var (
 		proceses []ps.Process

@@ -1,7 +1,7 @@
 package main
 
 import (
-	"microshell/input_processing"
+	"microshell/processing"
 )
 
 /*
@@ -24,5 +24,5 @@ import (
 */
 
 func main() {
-	input_processing.ReadLine()
+	processing.ReadLine()
 }

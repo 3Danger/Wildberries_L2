@@ -1,4 +1,4 @@
-package input_processing
+package processing
 
 import (
 	"bufio"
@@ -9,6 +9,7 @@ import (
 	"strings"
 )
 
+//ReadLine точка входа в нашу программу
 func ReadLine() {
 	const prefix = "\033[1;31m $> \033[0m "
 	var (

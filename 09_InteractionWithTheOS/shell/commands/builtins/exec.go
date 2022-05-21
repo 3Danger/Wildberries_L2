@@ -8,10 +8,12 @@ import (
 	"syscall"
 )
 
+//Exec структура реализующая утилиту exec
 type Exec struct {
 	common.Command
 }
 
+//Run запуск этой утилиты
 func (e *Exec) Run(group *sync.WaitGroup) (ok error) {
 	e.CloseFds()
 	_ = group

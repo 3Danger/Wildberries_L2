@@ -9,6 +9,7 @@ import (
 
 // (linux pipes, пример cmd1 | cmd2 | .... | cmdN).
 
+//Command родитель всех builtin команд и исполнитель не builtin комманд
 type Command struct {
 	args   []string
 	writer int
@@ -16,38 +17,47 @@ type Command struct {
 	pid    uintptr
 }
 
+//Pid возвращает пид текущей команды
 func (c *Command) Pid() uintptr {
 	return c.pid
 }
 
-func (c *Command) SetFd(pid uintptr) {
+//SetPid установить pid
+func (c *Command) SetPid(pid uintptr) {
 	c.pid = pid
 }
 
+//Args геттер аргументов
 func (c *Command) Args() []string {
 	return c.args
 }
 
+//Writer геттер файлового дескриптора для записи
 func (c *Command) Writer() int {
 	return c.writer
 }
 
+//SetWriter сеттер файлового дескриптора для записи
 func (c *Command) SetWriter(writer int) {
 	c.writer = writer
 }
 
+//Reader геттер файлового дескриптора для чтения
 func (c *Command) Reader() int {
 	return c.reader
 }
 
+//SetReader сеттер файлового дескриптора для чтения
 func (c *Command) SetReader(reader int) {
 	c.reader = reader
 }
 
+//NewCommand конструктор команды
 func NewCommand(args []string, writer, reader int) *Command {
 	return &Command{args, writer, reader, 0}
 }
 
+//DupAll для подмены файловых дескрипторов ввода и вывода
 func (c Command) DupAll() (ok error) {
 	if ok = syscall.Dup2(c.writer, 1); ok != nil {
 		return ok
@@ -59,6 +69,7 @@ func (c Command) DupAll() (ok error) {
 	return nil
 }
 
+//CloseFds Закрытие файловых дескрипторов если они не дефолтные
 func (c Command) CloseFds() {
 	var ok error
 	if c.writer != 1 {
@@ -73,11 +84,13 @@ func (c Command) CloseFds() {
 	}
 }
 
+//ForkMe разветление процесса
 func (c Command) ForkMe() (pid uintptr) {
 	pid, _, _ = syscall.Syscall(syscall.SYS_FORK, 0, 0, 0)
 	return pid
 }
 
+//Run Выполнение команды
 func (c *Command) Run(group *sync.WaitGroup) (ok error) {
 	pid := c.ForkMe()
 	if pid == 0 {
@@ -90,7 +103,7 @@ func (c *Command) Run(group *sync.WaitGroup) (ok error) {
 		os.Exit(1)
 	}
 	c.CloseFds()
-	c.SetFd(pid)
+	c.SetPid(pid)
 	group.Done()
 	return nil
 }

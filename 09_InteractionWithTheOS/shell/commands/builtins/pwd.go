@@ -7,10 +7,12 @@ import (
 	"syscall"
 )
 
+//Pwd структура реализующая утилиту pwd
 type Pwd struct {
 	common.Command
 }
 
+//Run запуск этой утилиты
 func (p Pwd) Run(group *sync.WaitGroup) (ok error) {
 	var wd string
 

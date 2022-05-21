@@ -8,10 +8,12 @@ import (
 	"sync"
 )
 
+//Kill структура реализующая утилиту kill
 type Kill struct {
 	common.Command
 }
 
+//Run запуск этой утилиты
 func (k *Kill) Run(group *sync.WaitGroup) (ok error) {
 	var (
 		pid  int

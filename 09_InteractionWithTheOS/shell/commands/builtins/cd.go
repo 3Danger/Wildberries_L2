@@ -7,12 +7,12 @@ import (
 	"sync"
 )
 
-//Run() error
-
+//Cd структура реализующая утилиту cd
 type Cd struct {
 	common.Command
 }
 
+//Run запуск этой утилиты
 func (c Cd) Run(group *sync.WaitGroup) (ok error) {
 	args := c.Args()
 	c.CloseFds()

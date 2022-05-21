@@ -7,10 +7,12 @@ import (
 	"syscall"
 )
 
+//Echo структура реализующая утилиту echo
 type Echo struct {
 	common.Command
 }
 
+//Run запуск этой утилиты
 func (e *Echo) Run(group *sync.WaitGroup) (ok error) {
 	var (
 		wasFlagN bool

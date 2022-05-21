@@ -11,7 +11,8 @@ import (
 	"strings"
 )
 
-func gerCleanArgs() (urls []string) {
+//getCleanArgs простая валидация и получение аргументов без первого аргумента
+func getCleanArgs() (urls []string) {
 	args := os.Args
 	if len(args) < 2 {
 		log.Fatal("usage: wget example.com example2.com ...")
@@ -20,6 +21,7 @@ func gerCleanArgs() (urls []string) {
 	return args[1:]
 }
 
+//CreateFolder создание папок
 func CreateFolder(folderName string) {
 	_, ok := os.Stat(folderName)
 	if os.IsExist(ok) {
@@ -41,7 +43,7 @@ func main() {
 		ulSet    = make(map[string]struct{})
 	)
 	CreateFolder(folder)
-	urls := gerCleanArgs()
+	urls := getCleanArgs()
 	for _, link := range urls {
 		link = strings.TrimRight(link, "/")
 		if mainlink, ok = url.ParseRequestURI(link); ok != nil {
