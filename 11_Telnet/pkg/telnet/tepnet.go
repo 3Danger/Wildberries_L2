@@ -13,11 +13,7 @@ import (
 	"wget/pkg/utils"
 )
 
-type Status struct {
-	sync.RWMutex
-	stat bool
-}
-
+//Connect хранение информации о соединении
 type Connect struct {
 	conn   net.Conn
 	in     io.Reader
@@ -26,6 +22,7 @@ type Connect struct {
 	status bool
 }
 
+//Run запуск основной программы
 func (c *Connect) Run() {
 	sig := make(chan os.Signal, 1)
 	signal.Notify(sig, syscall.SIGINT, syscall.SIGTERM)
@@ -45,18 +42,21 @@ func (c *Connect) Run() {
 	c.Disconnect()
 }
 
+// Recv получение данных
 func (c *Connect) Recv(okChan chan error) {
 	var ok error
 	_, ok = io.Copy(c.out, c.conn)
 	okChan <- ok
 }
 
+// Send отправка данных
 func (c *Connect) Send(okChan chan error) {
 	var ok error
 	_, ok = io.Copy(c.conn, c.in)
 	okChan <- ok
 }
 
+// Disconnect отключиться от хоста
 func (c *Connect) Disconnect() {
 	c.statMT.Lock()
 	if c.status {
@@ -80,6 +80,8 @@ func connect(conf *config.Config) (conn net.Conn, ok error) {
 	}
 	return
 }
+
+//NewConnection создание нового подключения
 func NewConnection(in io.Reader, out io.Writer) (conn *Connect, ok error) {
 	var conf *config.Config
 	conn = &Connect{nil, in, out, sync.Mutex{}, false}

@@ -10,27 +10,33 @@ import (
 	"time"
 )
 
+// Config структура для хранения конфигурации
 type Config struct {
 	timeOut    time.Duration
 	host, port *string
 }
 
+// SetHost сеттер для установления хоста
 func (c *Config) SetHost(host *string) {
 	c.host = host
 }
 
+// SetPort сеттер для установления порта
 func (c *Config) SetPort(port *string) {
 	c.port = port
 }
 
+// GetConnectionInfo формирование адресной строки для соединения
 func (c *Config) GetConnectionInfo() string {
 	return *c.host + ":" + *c.port
 }
 
+//GetTimeOut геттер для таймаута
 func (c *Config) GetTimeOut() time.Duration {
 	return c.timeOut
 }
 
+// NewConfig создание нового конфига на основе аргументов
 func NewConfig() (conf *Config, ok error) {
 	var host, port string
 	tm := time.Second * 10
