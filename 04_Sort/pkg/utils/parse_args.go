@@ -8,17 +8,19 @@ import (
 	"unicode"
 )
 
+//kValidate валидация флага (k)
 func kValidate(k int) {
 	if k <= 0 {
 		if k == 0 {
-			fmt.Fprintln(os.Stderr, "sort: field number is zero: invalid field specification ‘0’")
+			_, _ = fmt.Fprintln(os.Stderr, "sort: field number is zero: invalid field specification ‘0’")
 		} else {
-			fmt.Fprintf(os.Stderr, "sort: invalid number at field start: invalid count at start of ‘%d’\n", k)
+			_, _ = fmt.Fprintf(os.Stderr, "sort: invalid number at field start: invalid count at start of ‘%d’\n", k)
 		}
 		os.Exit(0)
 	}
 }
 
+//ParseFlags парсинг флажков
 func ParseFlags() (*map[byte]bool, int) {
 	var n, r, u bool
 	var k int
@@ -31,10 +33,12 @@ func ParseFlags() (*map[byte]bool, int) {
 	return &map[byte]bool{'n': n, 'r': r, 'u': u}, k - 1
 }
 
+//XOR исключающее "или"
 func XOR(a, b bool) bool {
 	return (a && !b) || (!a && b)
 }
 
+//StringComparator сравнение по символьно
 func StringComparator(a, b []rune) bool {
 	al, bl := len(a), len(b)
 	ai, bi := 0, 0
@@ -67,6 +71,7 @@ func StringComparator(a, b []rune) bool {
 	return al > bl
 }
 
+//GetIndex получение индекса символа по номеру колонки с учетом разделителя
 func GetIndex(data []rune, delim rune, column int) (index int) {
 	var last = 'k'
 	for i, v := range data {

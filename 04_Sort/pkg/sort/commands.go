@@ -25,8 +25,10 @@ import (
 	-h — сортировать по числовому значению с учетом суффиксов
 */
 
+//CommandMaker структура с единственной функцией задача которой описано ниже
 type CommandMaker struct{}
 
+//GetCommands определяет поведение сортировки на основе флажков
 func (CommandMaker) GetCommands(sortStruct *Sort) (IComparator, []ICommand) {
 	var comparators IComparator
 	command := make([]ICommand, 0)
@@ -49,7 +51,7 @@ func (CommandMaker) GetCommands(sortStruct *Sort) (IComparator, []ICommand) {
 // NumValueSort -n — сортировать по числовому значению
 type NumValueSort struct{}
 
-//drwxrwxr-x 4 csamuro csamuro    4096 May  9 11:55 .
+// Compare -n — сортировать по числовому значению
 func (NumValueSort) Compare(a, b []rune, k int, delim rune) bool {
 	sa, sb := string(a), string(b)
 	ai := utils.GetIndex(a, delim, k)
@@ -80,14 +82,14 @@ func (NumValueSort) Compare(a, b []rune, k int, delim rune) bool {
 			return massa != 0
 		}
 		return massa > massb
-	} else {
-		return !utils.StringComparator(a[ai:], b[bi:])
 	}
+	return !utils.StringComparator(a[ai:], b[bi:])
 }
 
 // DefaultSort — сортировать по умолчанию
 type DefaultSort struct{}
 
+// Compare — сортировать по умолчанию
 func (DefaultSort) Compare(a, b []rune, k int, delim rune) bool {
 	strA, strB := string(a), string(b)
 	_, _ = strA, strB
@@ -103,6 +105,7 @@ func (DefaultSort) Compare(a, b []rune, k int, delim rune) bool {
 // Reverse -r — сортировать в обратном порядке
 type Reverse struct{}
 
+// Exec -r — сортировать в обратном порядке
 func (Reverse) Exec(data []string) []string {
 	swapper := reflect.Swapper(data)
 	for i, j := 0, len(data)-1; i < j; i, j = i+1, j-1 {
@@ -114,6 +117,7 @@ func (Reverse) Exec(data []string) []string {
 // Unique -u — не выводить повторяющиеся строки
 type Unique struct{}
 
+// Exec -u — не выводить повторяющиеся строки
 func (Unique) Exec(data []string) []string {
 	tmp := make(map[string]uint32, len(data))
 	for _, v := range data {

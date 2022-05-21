@@ -24,20 +24,27 @@ import (
 	-h — сортировать по числовому значению с учетом суффиксов
 */
 
+//Sort главная структура
 type Sort struct {
+	//Сырые данные
 	data [][]rune
+	//Флажки
 	keys *map[byte]bool
-	k    int
+	//Номер колонки
+	k int
 }
 
+//IComparator интерфейс с методом сортировки
 type IComparator interface {
 	Compare(a, b []rune, k int, delim rune) bool
 }
 
+//ICommand интерфейс с каким то действием над данными
 type ICommand interface {
 	Exec([]string) []string
 }
 
+//NewSortUtil конструктор
 func NewSortUtil(bytes []byte, keys *map[byte]bool, k int) *Sort {
 	bytes = bytes2.Trim(bytes, "\n")
 	tmp := strings.Split(string(bytes), "\n")
@@ -48,7 +55,7 @@ func NewSortUtil(bytes []byte, keys *map[byte]bool, k int) *Sort {
 	return &Sort{runes, keys, k}
 }
 
-//func (s *Sort) sort(f func(a, b []rune, k int, delim rune) bool) {
+//sort сортировки по заданному алгоритму
 func (s *Sort) sort(cmp IComparator) *Sort {
 	swapper := reflect.Swapper(s.data)
 	for i := 0; i < len(s.data); i++ {
@@ -69,6 +76,7 @@ func (s *Sort) toStrings() (result []string) {
 	return result
 }
 
+//Run Точка входа, запуск и выполнение действий
 func (s *Sort) Run() string {
 	command, iCommands := CommandMaker{}.GetCommands(s)
 	toStrings := s.sort(command).toStrings()
