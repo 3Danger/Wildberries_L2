@@ -53,6 +53,7 @@ type СaesarСipher struct{ level int }
 //SortLexicographic Сортирует лексикографически
 type SortLexicographic struct{}
 
+//Processing перевести все буквы в верхний регистр
 func (Upper) Processing(s []string) {
 	size := len(s)
 	for i := 0; i < size; i++ {
@@ -60,6 +61,7 @@ func (Upper) Processing(s []string) {
 	}
 }
 
+//Processing сортирует слова по длине слова
 func (SortLength) Processing(s []string) {
 	size, swapper := len(s), reflect.Swapper(s)
 
@@ -72,6 +74,7 @@ func (SortLength) Processing(s []string) {
 	}
 }
 
+//Processing обычная лексикографическая сортировка
 func (SortLexicographic) Processing(s []string) {
 	size, swapper := len(s), reflect.Swapper(s)
 	compare := func(a, b string) bool {
@@ -93,6 +96,7 @@ func (SortLexicographic) Processing(s []string) {
 	}
 }
 
+//Processing применить шифр цезаря
 func (c СaesarСipher) Processing(s []string) {
 	size := len(s)
 	up := func(s string) string {

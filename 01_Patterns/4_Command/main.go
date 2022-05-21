@@ -40,6 +40,7 @@ type aCommand struct {
 	moneyToOperate float64
 }
 
+//IsCompleted было ли выполнено
 func (a *aCommand) IsCompleted() bool {
 	return a.isCompleted
 }
@@ -54,19 +55,21 @@ type Deposit struct {
 	aCommand
 }
 
+//NewDeposit конструктор
 func NewDeposit(toDeposit float64, account *Account) *Deposit {
 	return &Deposit{*newACommandAccount(account, toDeposit)}
 }
+
+//Execute выполнить
 func (d *Deposit) Execute() error {
 	if d.isCompleted {
-		return errors.New(fmt.Sprintf("deposit +$%f was completed", d.moneyToOperate))
-	} else {
-		d.isCompleted = true
-		d.account.money += d.moneyToOperate
-		fmt.Printf("%s: put money in account +$%f, ", d.account.name, d.moneyToOperate)
-		fmt.Printf("new balance $%f\n", d.account.money)
-		return nil
+		return fmt.Errorf("deposit +$%f was completed", d.moneyToOperate)
 	}
+	d.isCompleted = true
+	d.account.money += d.moneyToOperate
+	fmt.Printf("%s: put money in account +$%f, ", d.account.name, d.moneyToOperate)
+	fmt.Printf("new balance $%f\n", d.account.money)
+	return nil
 }
 
 // WithDraw Команда для снятия денег с аккаунта
@@ -74,21 +77,23 @@ type WithDraw struct {
 	aCommand
 }
 
+//NewWithdraw конструктор
 func NewWithdraw(toWithDraw float64, account *Account) *WithDraw {
 	return &WithDraw{*newACommandAccount(account, toWithDraw)}
 }
+
+//Execute выполнить
 func (w WithDraw) Execute() error {
 	if w.isCompleted {
-		return errors.New(fmt.Sprintf("withdraw -%f was completed", w.moneyToOperate))
+		return fmt.Errorf("withdraw -%f was completed", w.moneyToOperate)
 	} else if w.account.money < w.moneyToOperate {
 		return errors.New(w.account.name + ": haven't enough money not withdraw")
-	} else {
-		w.isCompleted = true
-		w.account.money -= w.moneyToOperate
-		fmt.Printf("%s: withdrawed from card -$%f, ", w.account.name, w.moneyToOperate)
-		fmt.Printf("new balance $%f\n", w.account.money)
-		return nil
 	}
+	w.isCompleted = true
+	w.account.money -= w.moneyToOperate
+	fmt.Printf("%s: withdrawed from card -$%f, ", w.account.name, w.moneyToOperate)
+	fmt.Printf("new balance $%f\n", w.account.money)
+	return nil
 }
 
 // Executable Интерфейс команд для взаимодействия с: CmdManager
@@ -101,10 +106,13 @@ type CmdManager struct {
 	commands []Executable
 }
 
+//Add добавить команду
 func (e *CmdManager) Add(execute Executable) *CmdManager {
 	e.commands = append(e.commands, execute)
 	return e
 }
+
+//Run выполнить команды
 func (e *CmdManager) Run() (ok error) {
 	for _, command := range e.commands {
 		if ok = command.Execute(); ok != nil {

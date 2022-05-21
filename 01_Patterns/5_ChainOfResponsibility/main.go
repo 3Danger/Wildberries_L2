@@ -36,6 +36,7 @@ func main() {
 	StartWar(warrior, enemy)
 }
 
+//IHero интерфейс персонажа воина
 type IHero interface {
 	Attack(hero IHero)
 	TakeDamage(hero IHero)
@@ -45,44 +46,51 @@ type IHero interface {
 	GetPowerAttack() int
 }
 
+//Hero персонаж воин
 type Hero struct {
 	name        string
 	health      int
 	powerAttack int
 }
 
+//NewHero новый персонаж (конструктор)
 func NewHero(name string, health, powerAttack int) *Hero {
 	return &Hero{name: name, health: health, powerAttack: powerAttack}
 }
 
+//GetPowerAttack геттер силы атаки
 func (h *Hero) GetPowerAttack() int {
 	return h.powerAttack
 }
 
+//Attack атакует
 func (h *Hero) Attack(hero IHero) {
 	hero.TakeDamage(h)
 	fmt.Println(h.name + " атаковал " + hero.GetName() + ".\n\t" + hero.GetInfo())
 	time.Sleep(time.Second)
 }
 
+//TakeDamage получить урон
 func (h *Hero) TakeDamage(hero IHero) {
 	//fmt.Println(h.GetName() + " получил урон от " + hero.GetName())
 	h.health -= hero.GetPowerAttack()
 	//fmt.Println(h.GetInfo())
 }
 
+//GetInfo получить информацию
 func (h *Hero) GetInfo() string {
 	if h.IsAlive() {
 		return fmt.Sprintf("%s, осталось здоровья: %d", h.GetName(), h.health)
-	} else {
-		return fmt.Sprintf("%s, погиб в бою", h.GetName())
 	}
+	return fmt.Sprintf("%s, погиб в бою", h.GetName())
 }
 
+//GetName геттер имени
 func (h *Hero) GetName() string {
 	return h.name
 }
 
+//IsAlive жив ли персонаж
 func (h *Hero) IsAlive() bool {
 	return h.health > 0
 }
@@ -90,20 +98,23 @@ func (h *Hero) IsAlive() bool {
 // Enemy структура врага
 type Enemy struct{ Hero }
 
+// NewEnemy конструктор врага
 func NewEnemy(name string, health, powerAttack int) *Enemy {
 	return &Enemy{*NewHero(name, health, powerAttack)}
 }
 
 // Warrior структура воинов
 type Warrior struct {
-	Hero
+	*Hero
 	Next *Warrior
 }
 
+//NewWarrior конструктор
 func NewWarrior(name string, health, powerAttack int) *Warrior {
-	return &Warrior{*NewHero(name, health, powerAttack), nil}
+	return &Warrior{NewHero(name, health, powerAttack), nil}
 }
 
+//StartWar точка входа в войну
 func StartWar(warrior *Warrior, enemy *Enemy) {
 	if enemy == nil {
 		return
@@ -130,9 +141,8 @@ func StartWar(warrior *Warrior, enemy *Enemy) {
 	if !enemy.IsAlive() {
 		fmt.Println("\t\tВраг побежден!")
 		fmt.Println("Победитель:", warrior.GetInfo())
-	} else {
+	} else if warrior != nil {
 		fmt.Println("\t\tВоины получили поражение!")
 		fmt.Println("Победитель:", enemy.GetInfo())
-
 	}
 }

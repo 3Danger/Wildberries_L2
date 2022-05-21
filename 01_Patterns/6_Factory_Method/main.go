@@ -20,46 +20,68 @@ import (
 		так как для каждого класса продукта надо создать свой подкласс создателя.
 */
 
+//IComputer интерфейс копухтера
 type IComputer interface {
 	GetType() string
 	PrintInfo()
 }
 
+//Computer некий компьютер, родитель всей вычислительной техники
 type Computer struct{ core, ram, vram int }
 
+//ServerComputer серверный компьютер
 type ServerComputer struct {
 	Computer
 }
+
+//LaptopComputer Ноутбук
 type LaptopComputer struct {
 	Computer
 	monitor bool
 }
-type Playstation struct {
+
+//PlayStation плейстешн
+type PlayStation struct {
 	Computer
 	joystick bool
 }
 
+//NewServerComputer конструктор
 func NewServerComputer() *ServerComputer {
 	return &ServerComputer{Computer{48, 256, 1}}
 }
+
+//NewLaptopComputer конструктор
 func NewLaptopComputer() *LaptopComputer {
 	return &LaptopComputer{Computer{8, 16, 6}, true}
 }
-func NewPlaystation(joystick bool) *Playstation {
-	return &Playstation{Computer{8, 16, 8}, joystick}
+
+//NewPlaystation конструктор
+func NewPlaystation(joystick bool) *PlayStation {
+	return &PlayStation{Computer{8, 16, 8}, joystick}
 }
 
+//GetType получить инфо о типе устройства
 func (ServerComputer) GetType() string { return "ServerComputer" }
-func (LaptopComputer) GetType() string { return "LaptopComputer" }
-func (Playstation) GetType() string    { return "Playstation___" }
 
+//GetType получить инфо о типе устройства
+func (LaptopComputer) GetType() string { return "LaptopComputer" }
+
+//GetType получить инфо о типе устройства
+func (PlayStation) GetType() string { return "Playstation___" }
+
+//PrintInfo печатем инфо об устройстве
 func (s ServerComputer) PrintInfo() {
 	fmt.Printf("%s, Cores %d, RAM %dgb, video RAM %dgb\n", s.GetType(), s.core, s.ram, s.vram)
 }
+
+//PrintInfo печатем инфо об устройстве
 func (l LaptopComputer) PrintInfo() {
 	fmt.Printf("%s, Cores %d, RAM %dgb, video RAM %dgb, monitor[%v]\n", l.GetType(), l.core, l.ram, l.vram, l.monitor)
 }
-func (p Playstation) PrintInfo() {
+
+//PrintInfo печатем инфо об устройстве
+func (p PlayStation) PrintInfo() {
 	fmt.Printf("%s, Cores %d, RAM %dgb, video RAM %dgb, joystick[%v]\n", p.GetType(), p.core, p.ram, p.vram, p.joystick)
 }
 
