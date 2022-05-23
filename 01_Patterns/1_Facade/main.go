@@ -24,18 +24,13 @@ import (
 		Божественный_объект - описывающий объект, который хранит в себе «слишком много» или делает «слишком много».
 */
 
-//DoIt Это наш супер фасад
-func DoIt() {
+func main() {
 	wg := sync.WaitGroup{}
 	wg.Add(3)
 
-	//DoItWork Это наш фасад найма на работу, и начала работы
+	// job.DoItWork Это наш фасад найма на работу, и начала работы
 	go job.DoItWork(&wg, job.NewDancerJob(), animal.NewElephant())
 	go job.DoItWork(&wg, job.NewLoaderJob(), animal.NewBull())
 	go job.DoItWork(&wg, job.NewPosterJob(), animal.NewMonkey())
 	wg.Wait()
-}
-
-func main() {
-	DoIt()
 }

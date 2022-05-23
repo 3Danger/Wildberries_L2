@@ -22,6 +22,31 @@ import (
 	1. Усложняет код программы из-за введения множества дополнительных классов.
 */
 
+func main() {
+	fmt.Println(strings.Repeat("-", 65))
+
+	// Создаем 2 аккаунта над которыми будут применяться команды
+	rasul := NewAccount("Rasul", 0)
+	ildar := NewAccount("Ildar", 0)
+
+	//Добавляем команды в менеджер-команд, и исполняем их через вызов Run()
+	cmdManager := CmdManager{}
+	if err := cmdManager.
+		Add(NewDeposit(820, rasul)).
+		Add(NewWithdraw(139, rasul)).
+		Add(NewDeposit(321, ildar)).
+		Add(NewDeposit(132.3, rasul)).
+		Add(NewWithdraw(192, ildar)).
+		Run(); err != nil {
+		log.Fatalln(err)
+	}
+	fmt.Println(strings.Repeat("-", 65))
+
+	// Выводим итоговый остаток баланса по аккаунтам
+	fmt.Println(*rasul)
+	fmt.Println(*ildar)
+}
+
 // Account некий аккаунт над которым будут производиться команды
 type Account struct {
 	name  string
@@ -120,29 +145,4 @@ func (e *CmdManager) Run() (ok error) {
 		}
 	}
 	return nil
-}
-
-func main() {
-	fmt.Println(strings.Repeat("-", 65))
-
-	// Создаем 2 аккаунта над которыми будут применяться команды
-	rasul := NewAccount("Rasul", 0)
-	ildar := NewAccount("Ildar", 0)
-
-	//Добавляем команды в менеджер-команд, и исполняем их через вызов Run()
-	cmdManager := CmdManager{}
-	if err := cmdManager.
-		Add(NewDeposit(820, rasul)).
-		Add(NewWithdraw(139, rasul)).
-		Add(NewDeposit(321, ildar)).
-		Add(NewDeposit(132.3, rasul)).
-		Add(NewWithdraw(192, ildar)).
-		Run(); err != nil {
-		log.Fatalln(err)
-	}
-	fmt.Println(strings.Repeat("-", 65))
-
-	// Выводим итоговый остаток баланса по аккаунтам
-	fmt.Println(*rasul)
-	fmt.Println(*ildar)
 }

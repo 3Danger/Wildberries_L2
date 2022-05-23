@@ -121,7 +121,7 @@ func StartWar(warrior *Warrior, enemy *Enemy) {
 	}
 	i := 1
 	for warrior != nil {
-		fmt.Printf("------------------%d-й Раунд------------------\n", i)
+		fmt.Printf("\033[0;31m------------------%d-й Раунд------------------\u001B[0m\n", i)
 		i++
 		//Warrior атакует врага
 		warrior.Attack(enemy)
