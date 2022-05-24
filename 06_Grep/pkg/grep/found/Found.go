@@ -111,7 +111,11 @@ func prepareResult(f *Found, i int) string {
 		}
 		prefix += fmt.Sprintf("\033[32m%d\033[34m-\033[0m", i+1)
 	}
-	return prefix + prepareRow([]byte(row), index.seg) + "\n"
+	if index != nil {
+		return prefix + prepareRow([]byte(row), index.seg) + "\n"
+	}
+	return prefix + row + "\n"
+
 }
 
 func prepareRow(row []byte, seg [][]int) string {
