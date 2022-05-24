@@ -2,8 +2,11 @@ package main
 
 import (
 	"Front/src/animal"
+	"Front/src/interfaces"
 	"Front/src/job"
+	"math/rand"
 	"sync"
+	"time"
 )
 
 /*
@@ -25,12 +28,54 @@ import (
 */
 
 func main() {
-	wg := sync.WaitGroup{}
-	wg.Add(3)
+	//Использование фасада
+	NewFacadeWorker(3).Run()
+}
 
-	// job.DoItWork Это наш фасад найма на работу, и начала работы
-	go job.DoItWork(&wg, job.NewDancerJob(), animal.NewElephant())
-	go job.DoItWork(&wg, job.NewLoaderJob(), animal.NewBull())
-	go job.DoItWork(&wg, job.NewPosterJob(), animal.NewMonkey())
+type FacadeWorker struct {
+	workers []interfaces.IWorkable
+	jobs    []interfaces.IJob
+}
+
+func NewFacadeWorker(workers int) (fw *FacadeWorker) {
+	fw = new(FacadeWorker)
+	for i := 0; i < workers; i++ {
+		rand.Seed(time.Now().UnixNano())
+		switch rand.Intn(3) {
+		case 0:
+			fw.jobs = append(fw.jobs, job.NewDancer())
+		case 1:
+			fw.jobs = append(fw.jobs, job.NewLoader())
+		case 2:
+			fw.jobs = append(fw.jobs, job.NewPoster())
+		}
+	}
+	for i := 0; i < workers; i++ {
+		rand.Seed(time.Now().UnixNano())
+		switch rand.Intn(3) {
+		case 0:
+			fw.workers = append(fw.workers, animal.NewBull())
+		case 1:
+			fw.workers = append(fw.workers, animal.NewMonkey())
+		case 2:
+			fw.workers = append(fw.workers, animal.NewElephant())
+		}
+	}
+	return
+}
+
+func (f FacadeWorker) Run() {
+	wg := sync.WaitGroup{}
+	if len(f.workers) >= len(f.jobs) {
+		wg.Add(len(f.jobs))
+		for i := range f.jobs {
+			go job.DoItWork(&wg, f.jobs[i], f.workers[i])
+		}
+	} else {
+		wg.Add(len(f.workers))
+		for i := range f.workers {
+			go job.DoItWork(&wg, f.jobs[i], f.workers[i])
+		}
+	}
 	wg.Wait()
 }

@@ -1,11 +1,11 @@
 package job
 
-//DancerJob работа где танцуют
-type DancerJob struct {
+//Dancer работа где танцуют
+type Dancer struct {
 	Job
 }
 
-//NewDancerJob конструктор
-func NewDancerJob() *DancerJob {
-	return &DancerJob{NewJob("Dancing")}
+//NewDancer конструктор
+func NewDancer() *Dancer {
+	return &Dancer{NewJob("Dancing")}
 }

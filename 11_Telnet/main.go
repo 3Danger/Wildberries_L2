@@ -1,7 +1,7 @@
 package main
 
 import (
-	"fmt"
+	"log"
 	"os"
 	"wget/pkg/telnet"
 )
@@ -31,8 +31,7 @@ go-telnet --timeout=3s 1.1.1.1 123
 func main() {
 	connection, err := telnet.NewConnection(os.Stdin, os.Stdout)
 	if err != nil {
-		fmt.Println(err)
-		return
+		log.Fatal(err)
 	}
 	connection.Run()
 }

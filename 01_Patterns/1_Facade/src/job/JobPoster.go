@@ -1,11 +1,11 @@
 package job
 
-//PosterJob работа почтальон
-type PosterJob struct {
+//Poster работа почтальон
+type Poster struct {
 	Job
 }
 
-//NewPosterJob конструктор
-func NewPosterJob() *PosterJob {
-	return &PosterJob{NewJob("Sends mail")}
+//NewPoster конструктор
+func NewPoster() *Poster {
+	return &Poster{NewJob("Sends mail")}
 }

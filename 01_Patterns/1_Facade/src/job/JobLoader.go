@@ -1,11 +1,11 @@
 package job
 
-//LoaderJob грузчик
-type LoaderJob struct {
+//Loader грузчик
+type Loader struct {
 	Job
 }
 
-//NewLoaderJob конструктор
-func NewLoaderJob() *LoaderJob {
-	return &LoaderJob{NewJob("mowing Garbage")}
+//NewLoader конструктор
+func NewLoader() *Loader {
+	return &Loader{NewJob("mowing Garbage")}
 }
