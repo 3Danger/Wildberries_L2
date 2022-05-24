@@ -32,11 +32,13 @@ func main() {
 	NewFacadeWorker(3).Run()
 }
 
+//FacadeWorker структура реализующая паттерн Фасад
 type FacadeWorker struct {
 	workers []interfaces.IWorkable
 	jobs    []interfaces.IJob
 }
 
+//NewFacadeWorker конструктор для фасада принимающая в качестве параметра количество работников
 func NewFacadeWorker(workers int) (fw *FacadeWorker) {
 	fw = new(FacadeWorker)
 	for i := 0; i < workers; i++ {
@@ -64,6 +66,7 @@ func NewFacadeWorker(workers int) (fw *FacadeWorker) {
 	return
 }
 
+//Run Запускаем работу
 func (f FacadeWorker) Run() {
 	wg := sync.WaitGroup{}
 	if len(f.workers) >= len(f.jobs) {
