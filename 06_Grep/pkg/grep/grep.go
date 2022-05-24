@@ -26,7 +26,6 @@ func (g Grep) GetData() []string { return g.rawData }
 func NewGrep() *Grep {
 	cnf := config.GetConfig()
 	var rawData = io.GetData(cnf)
-	cnf.Request = config.PrepareRequest(cnf.Request)
 	return &Grep{cnf, rawData}
 }
 
