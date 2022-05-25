@@ -106,15 +106,12 @@ func or2(channels ...<-chan interface{}) <-chan interface{} {
 			return
 		}
 		for {
-		loopMain:
 			for i := 0; i < length; i++ {
-			loopSelect:
 				select {
 				case <-channels[i]:
 					res <- struct{}{}
-					break loopMain
+					return
 				default:
-					break loopSelect
 				}
 			}
 		}
