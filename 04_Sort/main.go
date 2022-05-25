@@ -32,7 +32,6 @@ func main() {
 	bytes, ok := ioutil.ReadAll(os.Stdin)
 	if ok != nil {
 		log.Fatal(ok)
-		os.Exit(1)
 	}
 	fmt.Println(sort.NewSortUtil(bytes, flags, k).Run())
 }
