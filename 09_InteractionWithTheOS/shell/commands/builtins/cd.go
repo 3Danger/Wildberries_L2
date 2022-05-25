@@ -20,7 +20,7 @@ func (c Cd) Run(group *sync.WaitGroup) (ok error) {
 	if len(args) != 2 {
 		return errors.New("cd: too many arguments")
 	}
-	if ok := os.Chdir(args[1]); ok != nil {
+	if ok = os.Chdir(args[1]); ok != nil {
 		return errors.New("cd: " + ok.Error())
 	}
 

@@ -1,6 +1,7 @@
 package commands
 
 import (
+	"fmt"
 	"log"
 	"sync"
 	"syscall"
@@ -26,7 +27,9 @@ func ExecuteAll(executable []ICommand) {
 	for _, e := range executable {
 		group.Add(1)
 		if ok = e.Run(&group); ok != nil {
-			log.Fatal(ok)
+			if ok = fmt.Errorf("%v", ok); ok != nil {
+				log.Fatal(ok)
+			}
 		} else if e.Pid() > 0 {
 			if _, ok = syscall.Wait4(int(e.Pid()), nil, 0, nil); ok != nil {
 				log.Fatal(ok)
