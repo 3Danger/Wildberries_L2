@@ -8,9 +8,9 @@ import (
 	"time"
 )
 
-//GetInput обрабатываем флаги
+// GetInput обрабатываем флаги
 func GetInput() (filePath string) {
-	flag.StringVar(&filePath, "f", "files/small_file.txt", "file name")
+	flag.StringVar(&filePath, "f", "files/big_file.txt", "file name")
 	flag.Parse()
 	return
 }
@@ -22,13 +22,13 @@ func main() {
 
 	// <<< Функция поиска всех множеств анаграмм по словарю.>>>
 	now := time.Now()
-	result := anagram.FindAnagram(&data)
+	result := anagram.FindAnagram(data)
 	sub := time.Now().Sub(now)
 
 	//Выводим результат
-	for k, v := range *result {
+	for k, v := range result {
 		fmt.Printf("Group: %s\n", k)
-		for _, v := range *v {
+		for _, v := range v {
 			fmt.Printf("\t: %s\n", v)
 		}
 	}
